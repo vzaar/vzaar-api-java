@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>PhoneGap Vzaar WhoAmI</title>
+<script type="text/javascript" charset="utf-8" src="phonegap-0.9.3.js"></script>
+<script type="text/javascript" charset="utf-8" src="Vzaar.js"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+ document.addEventListener('deviceready', function() {	 	
+      	var btn = document.getElementById("whoamiBtn");
+	    btn.onclick = function() {	    
+	    	window.plugins.vzaar.whoami(document.getElementById("token").value,document.getElementById("secret").value,
+			    function(r){printWhoAmIResult(r)},
+			    function(e){log(e)}
+		    );
+	    }
+	    btn.disabled=false;
+ }, true);
+ 
+ 
+ function printWhoAmIResult(result){	
+    var innerHtmlText=getWhoAmIHtml(result);    
+    document.getElementById("result").innerHTML=innerHtmlText;
+    
+    window.plugins.vzaar.getUserDetails(document.getElementById("token").value,document.getElementById("secret").value,result,
+		    function(r){printUserDetailsResult(r)},
+		    function(e){log(e)}
+	    );
+    
+ }
+ 
+ function printUserDetailsResult(user){	
+	 var htmlText = "<br/>User Details:<br/><p>" + JSON.stringify(user) + "</p>";	 
+	 var previousResult = document.getElementById("result").innerHTML;	 
+	 document.getElementById("result").innerHTML=previousResult + "<br/>" + htmlText;
+	 
+	 window.plugins.vzaar.getAccountDetails(document.getElementById("token").value,document.getElementById("secret").value,user.author_account,
+			    function(r){printAccountDetailsResult(r)},
+			    function(e){log(e)}
+		    );
+ }
+ 
+ function printAccountDetailsResult(user){	
+	 var htmlText = "<br/>Account Details:<br/><p>" + JSON.stringify(user) + "</p>";	 
+	 var previousResult = document.getElementById("result").innerHTML;	 
+	 document.getElementById("result").innerHTML=previousResult + "<br/>" + htmlText;	 
+ }
+ 
+ function getWhoAmIHtml(name){
+    var htmlText = "<p>You are <h4>" + name + "</h4></p>";
+ 	return htmlText;
+ }
+ 
+</script>		
+</head>
+<body >
+<form name="form">
+	<label for="token">Token</label>
+	<textarea rows="2" id="token">u2nd3DVI71jQ7dTtz9mHA953XeIQeodmZvSE6AbTX8</textarea>
+	<br/>
+	<br/>
+	<label for="secret">Secret</label>
+	<input id = "secret" value="skitsanos" />
+	<br/>
+    <input id="whoamiBtn" type="button" value="Who AM I"  />
+    <hr>
+</form>
+    
+    <div id="result"></div>
+    
+    <hr>
+
+    
+</body>
+</html>

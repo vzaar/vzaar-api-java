@@ -1,0 +1,75 @@
+<project name="upload" default="dist" basedir=".">
+	
+	<property name="build.properties" value="build.properties" />
+	<property file="${build.properties}" />
+	
+	<property name="main.class" value="com.vzaar.examples.console.Upload"/>
+	
+	<property name="dir.src" value="src" /> 
+
+	<property name="dir.build" value="build" />	  
+	<property name="dir.build.classes" value="${dir.build}/classes" />  
+	<property name="dir.build.doc" value="${dir.build}/doc" />  
+
+	<property name="dir.bin" value="bin" />
+	<property name="dir.lib" value="lib" />  
+	<property name="dir.dist" value="dist" />
+
+    <property name="file.jar" value="${dir.dist}/${ant.project.name}.jar" />
+    <property name="file.zip" value="${dir.dist}/${ant.project.name}-${BUILD_VERSION}.zip" />
+  
+	
+	<path id="path.lib">
+   	<fileset dir="${dir.lib}">
+      	<include name="*.jar" />
+   	</fileset>
+	</path>
+
+	<target name="clean">
+     	<delete dir="${dir.build}" />
+     	<delete dir="${dir.dist}" />
+	</target>
+
+	<target name="compile">
+    	<mkdir dir="${dir.build.classes}" />		
+		<javac srcdir="${dir.src}"
+	     		destdir="${dir.build.classes}"
+	     		debug="on"
+	     		optimize="on"
+	     		nowarn="on"
+	     		target="1.5">      		
+  			<classpath refid="path.lib" />
+  		</javac>
+	</target>
+	
+	  <target name="jar" depends="clean,compile">
+          <mkdir dir="${dir.dist}/lib" />
+          <copydir src="${dir.lib}" dest="${dir.dist}/lib"/>
+	  	<manifestclasspath property="jar.classpath" jarfile="${dir.build}/${ant.project.name}.jar">
+	  		     <classpath refid="path.lib" />
+	  		  </manifestclasspath>
+	    <jar destfile="${dir.dist}/bin/${ant.project.name}.jar" basedir="${dir.build.classes}">
+	      <manifest>
+	        <attribute name="Main-Class" value="${main.class}" />
+	        <attribute name="Class-Path" value="${jar.classpath}" />
+	      </manifest>
+	    </jar>
+          <zip destfile="${file.zip}">
+			<zipfileset dir="${dir.lib}" prefix="lib"/>
+              <zipfileset dir="${dir.dist}/bin" prefix="bin"/>
+  	       </zip>
+        <!--<delete dir="${dir.build}" />
+     	<delete dir="${dir.dist}/bin" />
+        <delete dir="${dir.dist}/lib" />-->
+
+	  </target>
+	
+	
+	<target name="build" depends="jar">
+		<mkdir dir="${dir.dist}" />
+	</target>
+	
+	<target name="dist" depends="build">
+	</target>
+ 	 	
+</project>
