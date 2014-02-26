@@ -1,67 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/masterLayout"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/token"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-	<EditText
-        android:id="@+id/txtToken"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.19"
-        android:inputType="textMultiLine" 
-        android:text="u2nd3DVI71jQ7dTtz9mHA953XeIQeodmZvSE6AbTX8"/>
-    
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/secret"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <EditText
-        android:id="@+id/txtSecret"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="skitsanos"
-        android:hint="@string/userName" >
-
-        <requestFocus />
-    </EditText>
-    
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="  "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/whoAmIBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/whoami" />
-<TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="  "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-    <TextView
-        android:id="@+id/whoAmILbl"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/whoami"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-</LinearLayout>
