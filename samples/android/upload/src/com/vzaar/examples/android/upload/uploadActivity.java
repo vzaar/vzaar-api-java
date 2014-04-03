@@ -142,7 +142,8 @@ public class uploadActivity extends Activity{
     
     private void selectFile() {    	
     	Intent intent = new Intent();
-    	intent.setType("video/*");
+    	intent.setType("*/*");
+    	intent.addCategory(Intent.CATEGORY_OPENABLE);
     	intent.setAction(Intent.ACTION_GET_CONTENT);    	
     	startActivityForResult(Intent.createChooser(intent, "Select Video"), SELECT_VIDEO_DIALOG);
     	
