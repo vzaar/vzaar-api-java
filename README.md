@@ -1,6 +1,6 @@
 vzaar API Java client
 ---
-vzaar API client for Java developers.
+vzaar API client for Java developers. The documentation provided below is valid for API library release 2.04 and above.
 
 ---
 
@@ -38,7 +38,7 @@ If it returns you your vzaar username, - we are good to go.
 UserDetails details = api.getUserDetails(VZAAR_USERNAME);
 ```
 
-Where _VZAAR_USERNAME_ is the vzaar username. Result of this call will be an object of [UserDetails](com.vzaar.api/UserDetails.cs) type.
+Where _VZAAR_USERNAME_ is the vzaar username. Result of this call will be an object of [UserDetails](com.vzaar.api/src/UserDetails.java) type.
 
 ####Account Details
 
