@@ -5,7 +5,7 @@
     <string name="app_name">Vzaar-Upload</string>
     <string name="whoami">Who AMI</string>
     <string name="token">Token</string>
-    <string name="userName"></string>
+    <string name="userName">User Name</string>
     <string name="secret">Secret</string>
     <string name="empty"></string>
     <string name="upload">Upload to vzaar</string>

@@ -50,10 +50,10 @@ public class whoamiActivity extends Activity {
     
     private String getWhoAmI() {
     	String token = txtToken.getText().toString();
-    	String secret = txtSecret.getText().toString();
+    	String userName = txtSecret.getText().toString();
     	
-    	if ((token.length() > 0) && (secret.length() > 0)) {
-    		Vzaar api = new Vzaar(token, secret);
+    	if ((token.length() > 0) && (userName.length() > 0)) {
+    		Vzaar api = new Vzaar(userName, token);
     		String whoami;
 			try {
 				whoami = api.whoAmI();

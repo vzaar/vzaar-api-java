@@ -4,14 +4,9 @@ import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 
+import com.vzaar.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.vzaar.ProgressListener;
-import com.vzaar.UploadSignature;
-import com.vzaar.VideoDetails;
-import com.vzaar.Vzaar;
-import com.vzaar.VzaarException;
 
 public class testUpload {
 
@@ -19,11 +14,11 @@ public class testUpload {
 
     @Before
     public void setUp() throws Exception {
-        api = new Vzaar(TestConf.API_TOKEN, TestConf.API_SECRET);
+        api = new Vzaar(TestConf.API_USERNAME, TestConf.API_TOKEN);
     }
 
     @Test
-    public void testWhoAmIAPI() {
+    public void test() {
         //fail("Not yet implemented");
         String user = new String();
         try {
@@ -38,10 +33,18 @@ public class testUpload {
             fail("whoAmI api failed");
 
         try {
-            String guid = api.uploadVideo("E:/downloads/dinosaur.mp4", new Progress());
-            String videoId = api.processVideo(guid, "New Title", "New description", "new");
-            VideoDetails vdetails = api.getVideoDetails(new BigInteger(videoId), false);
-            System.out.println(vdetails.toString());
+            String guid = api.uploadVideo("c:\\songs\\12 - RESHAM KI DORI.mp4", new Progress());
+            VideoProcessQuery videoProcessQuery = new VideoProcessQuery();
+            videoProcessQuery.guid = guid;
+            videoProcessQuery.description = "Test Description";
+            videoProcessQuery.labels = new String[] { "label1", "label2" };
+            videoProcessQuery.title = "Title";
+            Long processVideoResponse = api.processVideo(videoProcessQuery);
+            System.out.println("Video Process Response - " +processVideoResponse);
+            System.out.println("Waiting for video to process");
+            Thread.sleep(1000 * 90 );
+            VideoDetails videoDetails = api.getVideoDetails(processVideoResponse);
+            System.out.println(videoDetails.toString());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

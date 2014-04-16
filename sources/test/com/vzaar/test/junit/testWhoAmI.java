@@ -14,7 +14,7 @@ public class testWhoAmI {
 
     @Before
     public void setUp() throws Exception {
-        api = new Vzaar(TestConf.API_TOKEN, TestConf.API_SECRET);
+        api = new Vzaar(TestConf.API_USERNAME, TestConf.API_TOKEN);
     }
 
     @Test

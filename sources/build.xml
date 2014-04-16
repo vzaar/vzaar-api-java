@@ -35,7 +35,7 @@
                debug="on"
                optimize="on"
                nowarn="on"
-               target="1.5">
+               target="1.7">
             <classpath refid="path.lib"/>
         </javac>
     </target>

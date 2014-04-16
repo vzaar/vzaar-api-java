@@ -2,10 +2,10 @@ package com.vzaar.test.junit;
 
 import static org.junit.Assert.*;
 
+import com.vzaar.UserDetails;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.vzaar.User;
 import com.vzaar.Vzaar;
 import com.vzaar.VzaarException;
 
@@ -15,7 +15,7 @@ public class testGetUserDetails {
 
     @Before
     public void setUp() throws Exception {
-        api = new Vzaar(TestConf.API_TOKEN, TestConf.API_SECRET);
+        api = new Vzaar(TestConf.API_USERNAME, TestConf.API_TOKEN);
     }
 
     @Test
@@ -27,7 +27,7 @@ public class testGetUserDetails {
                 System.out.println("Who AM I - " + userName);
             else
                 fail("whoAmI() api failed");
-            User userDetails = api.getUserDetails(userName);
+            UserDetails userDetails = api.getUserDetails(userName);
 
             if (null == userDetails)
                 fail("getUserDetails() api failed");

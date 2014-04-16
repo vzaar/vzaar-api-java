@@ -4,28 +4,36 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+
+
+
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/token"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-	<EditText
+
+	<EditText
         android:id="@+id/txtToken"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.19"
         android:inputType="textMultiLine" 
-        android:text="u2nd3DVI71jQ7dTtz9mHA953XeIQeodmZvSE6AbTX8"/>
-    
+        android:text="u2nd3DVI71jQ7dTtz9mHA953XeIQeodmZvSE6AbTX8"/>
+
+    
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/secret"
+        android:text="@string/userName"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
+
+
     <EditText
         android:id="@+id/txtSecret"
         android:layout_width="match_parent"
@@ -36,20 +44,28 @@
         <requestFocus />
     </EditText>
     
-
+
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="  "
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
+
+
     <Button
         android:id="@+id/whoAmIBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/whoami" />
-<TextView
+
+
+
+<TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

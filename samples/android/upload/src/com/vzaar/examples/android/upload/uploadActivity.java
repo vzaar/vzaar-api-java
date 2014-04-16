@@ -20,7 +20,7 @@ import android.widget.Toast;
 public class uploadActivity extends Activity{
 	
 	 public EditText txtToken;
-     public EditText txtSecret;
+     public EditText txtUserName;
      public Button btnSelectFile;
      public Button btnUploadFile;
      public Vzaar vzaarApi;
@@ -43,7 +43,7 @@ public class uploadActivity extends Activity{
     
     private void assignControls() {
     	txtToken = (EditText)findViewById(R.id.txtToken);
-        txtSecret = (EditText)findViewById(R.id.txtSecret);
+        txtUserName = (EditText)findViewById(R.id.txtSecret);
         btnSelectFile = (Button)findViewById(R.id.selectBtn);
         btnUploadFile = (Button)findViewById(R.id.uploadBtn);
         progress = (ProgressBar)findViewById(R.id.uploadProgress);
@@ -66,7 +66,7 @@ public class uploadActivity extends Activity{
     
     private class uploadVideoTask extends AsyncTask<String, Integer, String> {
     	private String token;
-    	private String secret;
+    	private String userName;
     	private Context context;
     	public uploadVideoTask(Context context) {
     		super();
@@ -76,7 +76,7 @@ public class uploadActivity extends Activity{
     	protected void onPreExecute() {
     		super.onPreExecute();
     		token = txtToken.getText().toString();
-    		secret = txtSecret.getText().toString();
+    		userName = txtUserName.getText().toString();
     		btnSelectFile.setEnabled(false);
     		btnUploadFile.setEnabled(false);
     		progress.setMax(100);
@@ -87,9 +87,9 @@ public class uploadActivity extends Activity{
 		protected String doInBackground(String... params) {
 			System.out.println("Length " + params.length + "\nFile - " + params[0]);
 			for (int i = 0; i < params.length; i++){	    		
-	    		if ((token.length() > 0) && (secret.length() > 0)) {
+	    		if ((token.length() > 0) && (userName.length() > 0)) {
 	    			if (null == vzaarApi)
-	    				vzaarApi = new Vzaar(token, secret);	    			
+	    				vzaarApi = new Vzaar(userName, token);
 	    			contentLength = new File(params[i]).length();
 					try {
 						Looper.prepare();
@@ -119,11 +119,11 @@ public class uploadActivity extends Activity{
 			progress.setVisibility(ProgressBar.INVISIBLE);
 			btnSelectFile.setEnabled(false);
     		btnUploadFile.setEnabled(false);
-    		System.out.println("REsult GUID - " + result);
+    		System.out.println("Result GUID - " + result);
     		Intent processIntent = new Intent(context, processVideoActivity.class);
     		processIntent.putExtra("guid", result);
     		processIntent.putExtra("token", txtToken.getText().toString());
-    		processIntent.putExtra("secret", txtSecret.getText().toString());
+    		processIntent.putExtra("userName", txtUserName.getText().toString());
     		startActivityForResult(processIntent, PROCESS_VIDEO_DIALOG);
 		}
 		

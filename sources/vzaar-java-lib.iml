@@ -14,6 +14,10 @@
     <libelement value="jar://$MODULE_DIR$/lib/gson-2.1-javadoc.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/gson-2.1.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/json_simple-1.1.jar!/" />
+    <libelement value="file://lib/httpclient-4.1.3.jar" />
+    <libelement value="file://lib/httpclient-cache-4.1.3.jar" />
+    <libelement value="file://lib/httpcore-4.1.4.jar" />
+    <libelement value="file://lib/httpmime-4.1.3.jar" />
     <src_description expected_position="0">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
       <src_folder value="file://$MODULE_DIR$/test" expected_position="1" />
@@ -145,6 +149,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="vzaar-java-api" level="project" />
   </component>
 </module>
 

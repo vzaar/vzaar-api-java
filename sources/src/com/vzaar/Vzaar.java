@@ -6,30 +6,12 @@
  */
 package com.vzaar;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URLEncoder;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpDelete;
@@ -39,71 +21,57 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.ContentEncodingHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.RequestExpectContinue;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.type.TypeReference;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class Vzaar
-{
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.net.URLEncoder;
+import java.util.List;
 
-	private String _token;
-	private String _secret;
-
-	public static final boolean enableFlashSupport = false;
+public class Vzaar {
+	public String username;
+	public String token;
+	public boolean enableFlashSupport = false;
+    public String apiUrl = "https://vzaar.com/";
+    public int bufferSize = 131072; //128Kb
 
 	private OAuthConsumer consumer;
 
-	public static final String URL_LIVE = "http://vzaar.com/";
-	public static final String AMAZON_S3_URL = ".s3.amazonaws.com/";
-
-	public String token()
-	{
-		return _token;
-	}
-
-	public void token(String _token)
-	{
-		this._token = _token;
-	}
-
-	public String secret()
-	{
-		return _secret;
-	}
-
-	public void secret(String _secret)
-	{
-		this._secret = _secret;
-	}
+	/**
+     * this method creates and initializes the OAuth Consumer
+     */
+    private void setAuth()
+    {
+        consumer = new CommonsHttpOAuthConsumer("", "");
+        consumer.setTokenWithSecret(username, token);
+    }
 
 	/**
-	 * This constructor creates a new Vzaar instance with the token and secret appropriately set
+	 * This constructor creates a new Vzaar instance with the username and token appropriately set
 	 *
-	 * @param token  API application token available at http://vzaar.com/settings/api
-	 * @param secret User name
+	 * @param username  API application username available at http://vzaar.com/settings/api
+	 * @param token User name
 	 */
-	public Vzaar(String token, String secret)
+	public Vzaar(String username, String token)
 	{
-		if ((null != token) && (token.length() > 0) && (null != secret) && (secret.length() > 0))
+		if ((null != username) && (username.length() > 0) && (null != token) && (token.length() > 0))
 		{
-			this._token = token;
-			this._secret = secret;
+			this.username = username;
+			this.token = token;
 		}
-	}
-
-	/**
-	 * this method creates and initializes the OAuth Consumer
-	 */
-	private void setAuth()
-	{
-		consumer = new CommonsHttpOAuthConsumer("", "");
-		consumer.setTokenWithSecret(_secret, _token);
 	}
 
 	/**
@@ -114,9 +82,8 @@ public class Vzaar
 	 */
 	public String whoAmI() throws VzaarException
 	{
-		String _url = Vzaar.URL_LIVE + "api/test/whoami.json";
-		if (null == consumer) setAuth();
-		String responseBody = getURLResponse(_url, true);
+		String _url = apiUrl + "api/test/whoami.json";
+		String responseBody = getURLResponse(_url);
 		String error = checkError(responseBody);
 		if (null != error) throw new VzaarException(error);
 		if (responseBody.length() > 0)
@@ -140,262 +107,79 @@ public class Vzaar
 	}
 
 	/**
-	 * This api gets the account details from the account id.
-	 *
-	 * @param account Integer Account id of the user. It can be retrieved via the getUserDetails() api.
-	 * @return Returns object of type {@link AccountsType}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
-	public AccountsType getAccountDetails(Integer account) throws VzaarException
-	{
-		String _url = Vzaar.URL_LIVE;
-		String responseBody = getURLResponse(_url + "api/accounts/" + account + ".json", false);
-		String error = checkError(responseBody);
-		if (null != error) throw new VzaarException(error);
-		//System.out.println(responseBody);
-		return AccountsType.fromJson(responseBody);
-	}
-
-	/**
 	 * This api gets the user details from the user name
 	 *
 	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @return Returns object of type {@link User}
+	 * @return Returns object of type {@link com.vzaar.UserDetails}
 	 * @throws {@link		 VzaarException}
 	 * @throws VzaarException
 	 */
-	public User getUserDetails(String userName) throws VzaarException
-	{
+	public UserDetails getUserDetails(String userName) throws VzaarException	{
 		if ((null == userName) || (userName.length() == 0)) return null;
-		String _url = Vzaar.URL_LIVE;
-		String responseBody = getURLResponse(_url + "api/" + userName + ".json", false);
+		String _url = apiUrl;
+		String responseBody = getURLResponse(_url + "api/" + userName + ".json");
 		//System.out.println(responseBody);
 		String error = checkError(responseBody);
 		if (null != error) throw new VzaarException(error);
-
-		return User.fromJson(responseBody);
+        return UserDetails.fromJson(responseBody);
 	}
 
+    /**
+     * This API call returns the details and rights for each vzaar subscription account type along with it's relevant metadata.
+     * This will show the details of the packages available here: http://vzaar.com/pricing
+     *
+     * @param accountId Integer Account id of the user. It can be retrieved via the getUserDetails() api.
+     * @return Returns object of type {@link com.vzaar.AccountDetails}
+     * @throws {@link		 VzaarException}
+     * @throws VzaarException
+     */
+    public AccountDetails getAccountDetails(Integer accountId) throws VzaarException
+    {
+        String _url = apiUrl + "/api/accounts/" + accountId + ".json";
+        String responseBody = getURLResponse(_url);
+        String error = checkError(responseBody);
+        if (null != error) throw new VzaarException(error);
+        System.out.println(responseBody);
+        return AccountDetails.fromJson(responseBody);
+    }
 
-	/**
-	 * This API call returns a list of the user's active videos along with it's
-	 * relevant metadata
-	 * http://vzaar.com/api/vzaar/videos.xml?title=vzaar
-	 *
-	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param count	Specifies the number of videos to retrieve per page. Default is 20. Maximum is 100
-	 * @param labels   Labels to be queried
-	 * @param status   Status to be queried
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
+    /**
+     * This API call returns a list of the user's active videos along with it's relevant metadata.
+     * 20 videos are returned by default but this is customisable.
+     *
+     * @param query
+     * @return {@link java.util.List
+     * @throws {@link VzaarException}
+     */
+	public List<Video> getVideoList(VideoListQuery query) throws VzaarException {
+		String _url = apiUrl + "api/" + username + "/videos.json?count=" + query.count;
 
-	public VideoList getVideoList(String userName, boolean auth, int count, String labels, String status) throws VzaarException
-	{
-		if (null == userName) return null;
+		if ((null != query.labels) && (query.labels.length > 0)) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String label : query.labels) {
+                stringBuilder.append(label).append(",");
+            }
+            _url += "&labels=" + stringBuilder.substring(0, stringBuilder.length() - 1);
+        }
 
-		String _url = Vzaar.URL_LIVE + "api/" + userName + "/videos.json?count=" + count;
-		if ((null != labels) && (labels.length() > 0)) _url += "&labels=" + labels;
-		if ((null != status) && (status.length() > 0)) _url += "&status=" + status;
+		if ((null != query.status) && (query.status.length() > 0))
+            _url += "&status=" + query.status;
 
-		String responseBody = getURLResponse(_url, auth);
-		return VideoList.fromJson(responseBody);
-	}
+        if (query.sort == VideoListSorting.ASCENDING)
+            _url += "&sort=asc";
+        else
+            _url += "&sort=desc";
 
-	/**
-	 * This API call returns a list of the user's active videos along with it's
-	 * relevant metadata
-	 * http://vzaar.com/api/vzaar/videos.xml?title=vzaar
-	 *
-	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param count	Specifies the number of videos to retrieve per page. Default is 20. Maximum is 100
-	 * @param labels   Labels to be queried
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
-	public VideoList getVideoList(String userName, boolean auth, int count, String labels) throws VzaarException
-	{
-		return getVideoList(userName, auth, count, labels, "");
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's
-	 * relevant metadata
-	 * http://vzaar.com/api/vzaar/videos.xml?title=vzaar
-	 *
-	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param count	Specifies the number of videos to retrieve per page. Default is 20. Maximum is 100
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
-	public VideoList getVideoList(String userName, boolean auth, int count) throws VzaarException
-	{
-		return getVideoList(userName, auth, count, "");
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's
-	 * relevant metadata
-	 * http://vzaar.com/api/vzaar/videos.xml?title=vzaar
-	 *
-	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
-	public VideoList getVideoList(String userName, boolean auth) throws VzaarException
-	{
-		return getVideoList(userName, auth, 20, "");
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's
-	 * relevant metadata
-	 * http://vzaar.com/api/vzaar/videos.xml?title=vzaar
-	 *
-	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
-	public VideoList getVideoList(String userName) throws VzaarException
-	{
-		return getVideoList(userName, false);
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param title	Title name of the video to be queried
-	 * @param labels   Labels to be queried
-	 * @param count	Specifies the number of videos to retrieve per page. Default is 20. Maximum is 100
-	 * @param page	 Specifies the page number to retrieve. Default is 1
-	 * @param sort	 Values can be asc (least_recent) or desc (most_recent). Defaults to desc
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link		 VzaarException}
-	 * @throws VzaarException
-	 */
-
-	public VideoList searchVideoList(String username, boolean auth, String title, String labels, int count, int page, String sort) throws VzaarException
-	{
-		if (null == username) return null;
-		if ((!sort.equalsIgnoreCase("asc")) && (!sort.equalsIgnoreCase("desc")))
-		{
-			sort = "desc";
-		}
-		String _url = Vzaar.URL_LIVE + "api/" + username + "/videos.json?count=" + count + "&page=" + page + "&sort=" + sort;
-		if ((null != labels) && (labels.length() > 0)) _url += "&labels=" + labels;
-		if ((null != title) && (title.length() > 0))
-		{
-			try
-			{
-				_url += "&title=" + URLEncoder.encode(title, "UTF-8");
-			} catch (UnsupportedEncodingException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		String responseBody = getURLResponse(_url, auth);
-//		System.out.println(responseBody);		
-		return VideoList.fromJson(responseBody);
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param title	Title name of the video to be queried
-	 * @param labels   Labels to be queried
-	 * @param count	Specifies the number of videos to retrieve per page. Default is 20. Maximum is 100
-	 * @param page	 Specifies the page number to retrieve. Default is 1
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoList searchVideoList(String username, boolean auth, String title, String labels, int count, int page) throws VzaarException
-	{
-		return searchVideoList(username, auth, title, labels, count, page, "desc");
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param title	Title name of the video to be queried
-	 * @param labels   Labels to be queried
-	 * @param count	Specifies the number of videos to retrieve per page. Default is 20. Maximum is 100
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoList searchVideoList(String username, boolean auth, String title, String labels, int count) throws VzaarException
-	{
-		return searchVideoList(username, auth, title, labels, count, 1);
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param title	Title name of the video to be queried
-	 * @param labels   Labels to be queried
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoList searchVideoList(String username, boolean auth, String title, String labels) throws VzaarException
-	{
-		return searchVideoList(username, auth, title, labels, 20);
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @param title	Title name of the video to be queried
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoList searchVideoList(String username, boolean auth, String title) throws VzaarException
-	{
-		return searchVideoList(username, auth, title, "");
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @param auth	 Use authenticated request if true
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoList searchVideoList(String username, boolean auth) throws VzaarException
-	{
-		return searchVideoList(username, auth, "");
-	}
-
-	/**
-	 * This API call returns a list of the user's active videos along with it's relevant metadata
-	 *
-	 * @param username It is the vzaar login name for the user. Note: This must be the userName and not the email address
-	 * @return Returns object of type {@link VideoList}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoList searchVideoList(String username) throws VzaarException
-	{
-		return searchVideoList(username, false);
+        if ((null != query.title) && (query.title.length() > 0)) {
+            try {
+                _url += "&title=" + URLEncoder.encode(query.title, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+		String responseBody = getURLResponse(_url);
+        System.out.println(responseBody);
+		return Video.fromJson(new TypeReference<List<Video>>() {}, responseBody);
 	}
 
 	/**
@@ -403,85 +187,51 @@ public class Vzaar
 	 * integrated with the vzaar. You can use the vzaar video URL to easily
 	 * obtain the appropriate embed code for that video
 	 *
-	 * @param id   It is the vzaar video number for that video available in {@link Video}
-	 * @param auth Use authenticated request if true
+	 * @param videoId It is the vzaar video number for that video available in {@link Video}
 	 * @return Returns object of type {@link VideoDetails}
 	 * @throws {@link VzaarException}
 	 */
-	public VideoDetails getVideoDetails(BigInteger id, boolean auth) throws VzaarException
+	public VideoDetails getVideoDetails(Long videoId) throws VzaarException
 	{
-		String _url = Vzaar.URL_LIVE + "api/videos/" + id + ".json";
-		String responseBody = getURLResponse(_url, auth);
-		//System.out.println(responseBody);
-		return VideoDetails.fromJson(responseBody);
-	}
-
-	/**
-	 * vzaar uses the oEmbed open standard for allowing 3rd parties to
-	 * integrated with the vzaar. You can use the vzaar video URL to easily
-	 * obtain the appropriate embed code for that video
-	 *
-	 * @param id It is the vzaar video number for that video available in {@link Video}
-	 * @return Returns object of type {@link VideoDetails}
-	 * @throws {@link VzaarException}
-	 */
-	public VideoDetails getVideoDetails(BigInteger id) throws VzaarException
-	{
-		return getVideoDetails(id, false);
+        String _url = apiUrl + "/api/videos/" + videoId + ".json";
+        String responseBody = getURLResponse(_url);
+        String error = checkError(responseBody);
+        if (null != error) throw new VzaarException(error);
+        System.out.println(responseBody);
+        VideoDetails videoDetails = VideoDetails.fromJson(responseBody);
+        videoDetails.poster = "http://view.vzaar.com/" + videoId + "/image";
+        return videoDetails;
 	}
 
 	/**
 	 * Edit video by its id
 	 *
-	 * @param id		  It is the vzaar video number for that video available in {@link Video}
-	 * @param title	   This is the title of the video
-	 * @param description This is the description of the video
-	 * @param isPrivate
-	 * @param seoUrl
+	 * @param videoEditQuery
 	 * @return Returns the response in string
 	 */
-	public String editVideo(BigInteger id, String title, String description, boolean isPrivate, String seoUrl)
+	public boolean editVideo(VideoEditQuery videoEditQuery)
 	{
-		String _url = Vzaar.URL_LIVE + "api/videos/" + id + ".xml";
+		String _url = apiUrl + "api/videos/" + videoEditQuery.id + ".xml";
 		StringBuilder postData = new StringBuilder();
 		postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		postData.append("<vzaar-api><_method>put</_method>");
-		if (null != title) postData.append("<video><title>").append(title).append("</title>");
-		if (null != description) postData.append("<description>").append(description).append("</description>");
-		postData.append("<private>").append(isPrivate).append("</private>");
-		if (null != seoUrl) postData.append("<seo_url>").append(seoUrl).append("</seo_url>");
+		if (null != videoEditQuery.title)
+            postData.append("<video><title>").append(videoEditQuery.title).append("</title>");
+		if (null != videoEditQuery.description)
+            postData.append("<description>").append(videoEditQuery.description).append("</description>");
+		postData.append("<private>").append(videoEditQuery.markAsPrivate).append("</private>");
+		if (null != videoEditQuery.seoUrl)
+            postData.append("<seo_url>").append(videoEditQuery.seoUrl).append("</seo_url>");
 		postData.append("</video></vzaar-api>");
 
 		//System.out.println(postData.toString());
-		return getURLResponse(_url, true, "POST", postData.toString());
-	}
+		String responseBody = getURLResponse(_url, true, "POST", postData.toString());
 
-	/**
-	 * Edit video by its id
-	 *
-	 * @param id		  It is the vzaar video number for that video available in {@link Video}
-	 * @param title	   This is the title of the video
-	 * @param description This is the description of the video
-	 * @param isPrivate
-	 * @return Returns the response in string
-	 */
-	public String editVideo(BigInteger id, String title, String description, boolean isPrivate)
-	{
-		return editVideo(id, title, description, isPrivate, "");
-	}
+        if ((null == responseBody) || (responseBody.length() == 0))
+            return false;
 
-	/**
-	 * Edit video by its id
-	 *
-	 * @param id		  It is the vzaar video number for that video available in {@link Video}
-	 * @param title	   This is the title of the video
-	 * @param description This is the description of the video
-	 * @return Returns the response in string
-	 */
-	public String editVideo(BigInteger id, String title, String description)
-	{
-		return editVideo(id, title, description, false, "");
-	}
+        return true;
+    }
 
 	/**
 	 * Delete video by its id
@@ -489,15 +239,34 @@ public class Vzaar
 	 * @param id It is the vzaar video number for that video available in {@link Video}
 	 * @return Returns the response in string
 	 */
-	public String deleteVideo(BigInteger id)
+	public boolean deleteVideo(Long id)
 	{
-		String _url = Vzaar.URL_LIVE + "api/videos/" + id + ".xml";
+		String _url = apiUrl + "api/videos/" + id + ".xml";
 		StringBuilder postData = new StringBuilder();
 		postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		postData.append("<vzaar-api><_method>delete</_method></video></vzaar-api>");
 
 		System.out.println(_url + "\n" + postData.toString());
-		return getURLResponse(_url, true, "DELETE", postData.toString());
+		String responseBody = getURLResponse(_url, true, "DELETE", postData.toString());
+
+        System.out.println(responseBody);
+
+        int videoStatusId = 0;
+        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+        domFactory.setNamespaceAware(false);
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(responseBody));
+        Document document;
+        try
+        {
+            document = domFactory.newDocumentBuilder().parse(is);
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            videoStatusId = Integer.parseInt((String)xpath.compile("/oembed/video_status_id/text()").evaluate(document, XPathConstants.STRING));
+        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+            e.printStackTrace();
+        }
+
+        return VideoStatus.DELETED.value == videoStatusId;
 	}
 
 
@@ -506,30 +275,34 @@ public class Vzaar
 	 * then provide a vzaar video idea back.
 	 * http://developer.vzaar.com/docs/version_1.0/uploading/process
 	 *
-	 * @param guid		Specifies the guid (returned after calling {@link #uploadVideo(String, ProgressListener)} to operate on
-	 * @param title	   Specifies the tile of the video
-	 * @param description Specifies the description for the video
-	 * @param labels
-	 * @param profile	 Specifies the size for the video to be encoded in. If not specified, this will use the vzaar default
-	 * @param transcoding If True forces vzaar to transcode the video, false makes vzaar use the original source file (available only for mp4 and flv files)
-	 * @param replace	 Specifies the video ID of an existing video that you wish to replace with the new video.
+	 * @param videoProcessQuery
 	 * @return Returns the videoId in string
 	 */
 
-	public String processVideo(String guid, String title, String description, String labels, int profile, boolean transcoding, String replace)
-	{
-		String _url = Vzaar.URL_LIVE + "api/videos";
-		String videoId = null;
+	public Long processVideo(VideoProcessQuery videoProcessQuery) {
+		String _url = apiUrl + "api/videos";
+		Long videoId = null;
 		StringBuilder postData = new StringBuilder();
 		postData.append("<vzaar-api><video>");
-		if ((null != replace) && (replace.length() > 0))
-			postData.append("<replace_id>").append(replace).append("</replace_id>");
-		postData.append("<guid>").append(guid).append("</guid>");
-		if (null != title) postData.append("<title>").append(title).append("</title>");
-		if (null != description) postData.append("<description>").append(description).append("</description>");
-		if (null != labels) postData.append("<labels>").append(labels).append("</labels>");
-		postData.append("<profile>").append(profile).append("</profile>");
-		if (transcoding) postData.append("<transcoding>true</transcoding>");
+		if ((null != videoProcessQuery.replaceId) && (videoProcessQuery.replaceId.length() > 0))
+			postData.append("<replace_id>").append(videoProcessQuery.replaceId).append("</replace_id>");
+        if ((null != videoProcessQuery.guid) && (videoProcessQuery.guid.length() > 0))
+		    postData.append("<guid>").append(videoProcessQuery.guid).append("</guid>");
+		if (null != videoProcessQuery.title)
+            postData.append("<title>").append(videoProcessQuery.title).append("</title>");
+		if (null != videoProcessQuery.description)
+            postData.append("<description>").append(videoProcessQuery.description).append("</description>");
+		if ((null != videoProcessQuery.labels) && (videoProcessQuery.labels.length > 0)) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String label : videoProcessQuery.labels)
+                stringBuilder.append(label).append(",") ;
+            postData.append("<labels>")
+                    .append(stringBuilder.substring(0, stringBuilder.length() - 1))
+                    .append("</labels>");
+        }
+		postData.append("<profile>").append(videoProcessQuery.profile).append("</profile>");
+		if (videoProcessQuery.transcode)
+            postData.append("<transcoding>true</transcoding>");
 		postData.append("</video></vzaar-api>");
 		//System.out.println(postData.toString());
 		String responseBody = getURLResponse(_url, true, "POST", postData.toString());
@@ -543,79 +316,33 @@ public class Vzaar
 		{
 			document = domFactory.newDocumentBuilder().parse(is);
 			XPath xpath = XPathFactory.newInstance().newXPath();
-			videoId = (String) xpath.compile("/vzaar-api/video/text()").evaluate(document, XPathConstants.STRING);
-		} catch (SAXException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (XPathExpressionException e)
-		{
-			// TODO Auto-generated catch block
+			videoId = Long.valueOf((String) xpath.compile("/vzaar-api/video/text()").evaluate(document, XPathConstants.STRING));
+		} catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
 			e.printStackTrace();
 		}
 
 		return videoId;
 	}
 
-	/**
-	 * This API call tells the vzaar system to process a newly uploaded video. This will encode it if necessary and
-	 * then provide a vzaar video idea back.
-	 * http://developer.vzaar.com/docs/version_1.0/uploading/process
-	 *
-	 * @param guid		Specifies the guid (returned after calling {@link #uploadVideo(String, ProgressListener)} to operate on
-	 * @param title	   Specifies the tile of the video
-	 * @param description Specifies the description for the video
-	 * @param labels
-	 * @param profile	 Specifies the size for the video to be encoded in. If not specified, this will use the vzaar default
-	 * @param transcoding If True forces vzaar to transcode the video, false makes vzaar use the original source file (available only for mp4 and flv files)
-	 * @return Returns the videoId in string
-	 */
-	public String processVideo(String guid, String title, String description, String labels, int profile, boolean transcoding)
-	{
-		return processVideo(guid, title, description, labels, profile, transcoding, "");
-	}
+    /**
+     * Get Upload Signature
+     *
+     * @return Returns object of type {@link UploadSignature}
+     */
+    public UploadSignature getUploadSignature()
+    {
+        String _url = apiUrl + "api/videos/signature";
+        UploadSignature signature = null;
+        if (enableFlashSupport)
+        {
+            _url += "?flash_request=true";
+        }
 
-	/**
-	 * This API call tells the vzaar system to process a newly uploaded video. This will encode it if necessary and
-	 * then provide a vzaar video idea back.
-	 * http://developer.vzaar.com/docs/version_1.0/uploading/process
-	 *
-	 * @param guid		Specifies the guid (returned after calling {@link #uploadVideo(String, ProgressListener)} to operate on
-	 * @param title	   Specifies the tile of the video
-	 * @param description Specifies the description for the video
-	 * @param labels
-	 * @param profile	 Specifies the size for the video to be encoded in. If not specified, this will use the vzaar default
-	 * @return Returns the videoId in string
-	 */
-
-	public String processVideo(String guid, String title, String description, String labels, int profile)
-	{
-		return processVideo(guid, title, description, labels, profile, false);
-	}
-
-	/**
-	 * This API call tells the vzaar system to process a newly uploaded video. This will encode it if necessary and
-	 * then provide a vzaar video idea back.
-	 * http://developer.vzaar.com/docs/version_1.0/uploading/process
-	 *
-	 * @param guid		Specifies the guid (returned after calling {@link #uploadVideo(String, ProgressListener)} to operate on
-	 * @param title	   Specifies the tile of the video
-	 * @param description Specifies the description for the video
-	 * @param labels
-	 * @return Returns the videoId in string
-	 */
-	public String processVideo(String guid, String title, String description, String labels)
-	{
-		return processVideo(guid, title, description, labels, Profile.Medium);
-	}
+        String responseBody = getURLResponse(_url);
+//		System.out.println(responseBody);
+        signature = new UploadSignature(responseBody);
+        return signature;
+    }
 
 	/**
 	 * Get Upload Signature
@@ -625,15 +352,15 @@ public class Vzaar
 	 */
 	public UploadSignature getUploadSignature(String redirectUrl)
 	{
-		String _url = Vzaar.URL_LIVE + "api/videos/signature";
+		String _url = apiUrl + "api/videos/signature";
 		UploadSignature signature = null;
-		if (Vzaar.enableFlashSupport)
+		if (enableFlashSupport)
 		{
 			_url += "?flash_request=true";
 		}
 		if ((null != redirectUrl) && (redirectUrl.length() > 0))
 		{
-			if (Vzaar.enableFlashSupport)
+			if (enableFlashSupport)
 			{
 				_url += "&success_action_redirect=" + redirectUrl;
 			} else
@@ -642,9 +369,9 @@ public class Vzaar
 			}
 		}
 
-		String responseBody = getURLResponse(_url, true);
+		String responseBody = getURLResponse(_url);
 //		System.out.println(responseBody);
-		signature = UploadSignature.fromXml(responseBody);
+		signature = new UploadSignature(responseBody);
 		return signature;
 	}
 
@@ -659,8 +386,8 @@ public class Vzaar
      * @throws {@link Exception]}
      */
     public String uploadVideo(InputStream in, String fileName, long contentLength, ProgressListener listener) throws Exception {
-        UploadSignature signature = getUploadSignature(null);
-        String _url = "https://" + signature.bucket() + ".s3.amazonaws.com/";
+        UploadSignature signature = getUploadSignature();
+        String _url = "https://" + signature.bucket + ".s3.amazonaws.com/";
         String guid = null;
         if (null == consumer)
             setAuth();
@@ -671,20 +398,21 @@ public class Vzaar
         HttpPost request = new HttpPost(_url);
 
         if ((null != in) && (null != fileName) && (1 <= contentLength))  {
-            ContentBody body = new FileStreamingBody(in, fileName, contentLength);
+            ContentBody body = new FileStreamingBody(in, fileName, contentLength, bufferSize);
 
             request.addHeader("User-agent", "Vzaar API Client");
-            request.addHeader("x-amz-acl", signature.acl());
+            request.addHeader("x-amz-acl", signature.acl);
             request.addHeader("Enclosure-Type", "multipart/form-data");
 
             CountingMultiPartEntity entity = new CountingMultiPartEntity(listener);
-            entity.addPart("AWSAccessKeyId", new StringBody(signature.accesskeyid()));
-            entity.addPart("Signature", new StringBody(signature.signature()));
-            entity.addPart("acl", new StringBody(signature.acl()));
-            entity.addPart("bucket", new StringBody(signature.bucket()));
-            entity.addPart("policy", new StringBody(signature.policy()));
+
+            entity.addPart("AWSAccessKeyId", new StringBody(signature.accessKeyId));
+            entity.addPart("Signature", new StringBody(signature.signature));
+            entity.addPart("acl", new StringBody(signature.acl));
+            entity.addPart("bucket", new StringBody(signature.bucket));
+            entity.addPart("policy", new StringBody(signature.policy));
             entity.addPart("success_action_status", new StringBody("201"));
-            entity.addPart("key", new StringBody(signature.key()));
+            entity.addPart("key", new StringBody(signature.key));
             entity.addPart("file", body);
 
             request.setEntity(entity);
@@ -729,10 +457,26 @@ public class Vzaar
         return null;
     }
 
+    /**
+     * Upload video from local drive directly to Amazon S3 bucket
+     *
+     * @param path     Path of the video file to be uploaded
+     * @return string GUID of the file uploaded
+     * @throws {@link Exception]}
+     */
+    public String uploadVideo(String path) throws Exception {
+        File file = new File(path);
+        if (file.exists()) {
+            long contentLength = file.length();
+            return uploadVideo(new FileInputStream(file), path, contentLength, null);
+        }
+        return null;
+    }
 
-	private String getURLResponse(String url, boolean auth)
+
+	private String getURLResponse(String url)
 	{
-		return getURLResponse(url, auth, "GET", null);
+		return getURLResponse(url, true, "GET", null);
 	}
 
 	private String getURLResponse(String url, boolean auth, String method, String data)
@@ -754,7 +498,7 @@ public class Vzaar
 				StringEntity postData = new StringEntity(data);
 				request.setEntity(postData);
 				request.addHeader("User-agent", "Vzaar OAuth Client");
-				request.addHeader("Connection", "close");
+//				request.addHeader("Connection", "close");
 				request.addHeader("Content-Type", "application/xml");
 				if (auth) consumer.sign(request);
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -763,34 +507,15 @@ public class Vzaar
 			{
 				HttpDelete request = new HttpDelete(url);
 				request.addHeader("User-agent", "Vzaar OAuth Client");
-				request.addHeader("Connection", "close");
+//				request.addHeader("Connection", "close");
 				request.addHeader("Content-Type", "application/xml");
 				if (auth) consumer.sign(request);
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
 				responseBody = httpClient.execute(request, responseHandler);
 			}
-		} catch (OAuthMessageSignerException e)
-		{
-			// TODO Auto-generated catch block
+		} catch (IOException | OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException e) {
 			e.printStackTrace();
-		} catch (OAuthExpectationFailedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OAuthCommunicationException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally
-		{
+		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
 		return responseBody;

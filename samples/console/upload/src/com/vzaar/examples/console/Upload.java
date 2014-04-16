@@ -1,56 +1,46 @@
 package com.vzaar.examples.console;
 
-import com.vzaar.ProgressListener;
-import com.vzaar.Vzaar;
+import com.vzaar.*;
 import jline.ConsoleReader;
 import jline.Terminal;
 
+import javax.smartcardio.TerminalFactory;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.util.Date;
 
 public class Upload implements ProgressListener{
 	private Terminal terminal;
     private ConsoleReader reader;
     private static long contentLength;
+
 	public static void main(String args[]) {
 		Vzaar vzaarApi;
-		if (args.length >= 3) {
-			System.out.println(new Timestamp(new Date().getTime()));
+		if (args.length == 6) {
 			vzaarApi = new Vzaar(args[0], args[1]);
 			String guid;
 			try {
+                System.out.println("Initiating Video Upload");
                 contentLength = new File(args[2]).length();
 				guid = vzaarApi.uploadVideo(args[2], new Upload());
 				System.out.println("GUID - " + guid);
-                System.out.println("Initiated Video Processing");
-                String videoId = null;
-                switch (args.length) {
-                case 3:
-                    videoId = vzaarApi.processVideo(guid, "", "", "");
-                    break;
-				case 4:
-                    videoId = vzaarApi.processVideo(guid, args[3], "", "");
-                    break;
-                case 5:
-                    videoId = vzaarApi.processVideo(guid, args[3], args[4], "");
-                    break;
-                case 6:
-                    videoId = vzaarApi.processVideo(guid, args[3], args[4], args[5]);
-                }
-
+                System.out.println("Initiating Video Processing");
+                VideoProcessQuery videoProcessQuery = new VideoProcessQuery();
+                videoProcessQuery.guid = guid;
+                videoProcessQuery.title = args[3];
+                videoProcessQuery.description = args[4];
+                videoProcessQuery.labels = args[5].split(",");
+				Long videoId = vzaarApi.processVideo(videoProcessQuery);
 				System.out.println("Video ID - " + videoId);
-				//System.out.println(vzaarApi.getVideoDetails(new BigInteger(videoId), false).toString());
+				System.out.println(vzaarApi.getVideoDetails(videoId).toString());
 			
 			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
 			printPrompt();
 		}
-		System.out.println(new Timestamp(new Date().getTime()));
 	}
 
     public Upload(){
@@ -90,12 +80,12 @@ public class Upload implements ProgressListener{
     }
 	
 	public static void printPrompt() {
-		System.out.print("Usage:\njava -jar upload.jar token secret video-path title description labels\n");
+		System.out.print("Usage:\njava -jar upload.jar username token video-path title description labels\n");
+		System.out.print("username    -  Username of the vzaar account\n");
 		System.out.print("token       -  API application token available at http://vzaar.com/settings/api\n");
-        System.out.print("secret      -  Username of the vzaar account\n");
 		System.out.print("video-path  -  Path of the video file to be uploaded\n");
-		System.out.print("title       -  [Optional] Title of the Video File\n");
-		System.out.print("description -  [Optional] Description of the Video File\n");
-		System.out.print("labels      -  [Optional] Labels (comma separated) of the Video File\n");
+		System.out.print("title       -  Title of the Video File\n");
+		System.out.print("description -  Description of the Video File\n");
+		System.out.print("labels      -  Labels (comma separated) of the Video File\n");
 	}
 }

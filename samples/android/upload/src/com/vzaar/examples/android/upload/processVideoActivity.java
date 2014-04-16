@@ -2,6 +2,7 @@ package com.vzaar.examples.android.upload;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import com.vzaar.VideoProcessQuery;
 import com.vzaar.Vzaar;
 
 import android.app.Activity;
@@ -20,10 +21,10 @@ public class processVideoActivity extends Activity {
     public String guid;
     
     private String token;
-    private String secret;
+    private String userName;
     private Vzaar vzaarApi;
     
-    private String videoId;
+    private Long videoId;
     
     public Button btnProcessVideo;
      
@@ -38,13 +39,13 @@ public class processVideoActivity extends Activity {
         Intent intent = getIntent();
         guid = intent.getStringExtra("guid");
         token = intent.getStringExtra("token");
-        secret = intent.getStringExtra("secret");
+        userName = intent.getStringExtra("userName");
     }
     
     private void addListeneres() {
 		btnProcessVideo.setOnClickListener(new View.OnClickListener() {			
 			public void onClick(View v) {
-				if ((token.length() > 0) && (secret.length() > 0)) {
+				if ((token.length() > 0) && (userName.length() > 0)) {
 					processFile();
 					finish();
 					return;
@@ -75,9 +76,14 @@ public class processVideoActivity extends Activity {
         @Override
         protected String doInBackground(String... params) {
             if (null == vzaarApi)
-                vzaarApi = new Vzaar(token, secret);
+                vzaarApi = new Vzaar(userName, token);
             if (guid.length() > 0) {
-                videoId = vzaarApi.processVideo(guid, txtTitle.getText().toString(), txtDesc.getText().toString(), txtLabels.getText().toString());
+                VideoProcessQuery videoProcessQuery = new VideoProcessQuery();
+                videoProcessQuery.guid = guid;
+                videoProcessQuery.title = txtTitle.getText().toString();
+                videoProcessQuery.description = txtDesc.getText().toString();
+                videoProcessQuery.labels = txtLabels.getText().toString().split(",");
+                videoId = vzaarApi.processVideo(videoProcessQuery);
             }
 
             return guid;
