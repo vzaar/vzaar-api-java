@@ -45,6 +45,14 @@ public class testUpload {
             Thread.sleep(1000 * 90 );
             VideoDetails videoDetails = api.getVideoDetails(processVideoResponse);
             System.out.println(videoDetails.toString());
+
+            SubtitleQuery subtitleQuery = new SubtitleQuery();
+            subtitleQuery.videoId = 1600326;
+            subtitleQuery.language = "English";
+            subtitleQuery.body = "This is test subtitle";
+
+            api.uploadSubtitle(subtitleQuery);
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

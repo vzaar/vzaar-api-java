@@ -38,6 +38,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -325,6 +326,46 @@ public class Vzaar {
 	}
 
     /**
+     * Upload subtitle
+     *
+     * @param query   SubtitleQuery object
+     * @return boolean upload success
+     * @throws {@link Exception]}
+     */
+    public boolean uploadSubtitle(SubtitleQuery query) throws Exception {
+        String _url = "http://vzaar.com/api/subtitle/upload.xml";
+        StringBuilder postData = new StringBuilder();
+        postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><vzaar-api><subtitle><language>")
+                .append(query.language)
+                .append( "</language><video_id>")
+                .append(query.videoId)
+                .append("</video_id><body>")
+                .append(query.body)
+                .append("</body></subtitle></vzaar-api>");
+
+        System.out.println(postData.toString());
+        String responseBody = getURLResponse(_url, true, "POST", postData.toString());
+        System.out.println(responseBody);
+        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+        domFactory.setNamespaceAware(false);
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(responseBody));
+        Document document;
+        try
+        {
+            document = domFactory.newDocumentBuilder().parse(is);
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            String status = (String) xpath.compile("//status/text()").evaluate(document, XPathConstants.STRING);
+            if (status.equalsIgnoreCase("accepted"))
+                return true;
+        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
      * Get Upload Signature
      *
      * @return Returns object of type {@link UploadSignature}
@@ -474,6 +515,7 @@ public class Vzaar {
     }
 
 
+
 	private String getURLResponse(String url)
 	{
 		return getURLResponse(url, true, "GET", null);
@@ -496,7 +538,7 @@ public class Vzaar {
 			{
 				HttpPost request = new HttpPost(url);
 				StringEntity postData = new StringEntity(data);
-				request.setEntity(postData);
+                request.setEntity(postData);
 				request.addHeader("User-agent", "Vzaar OAuth Client");
 //				request.addHeader("Connection", "close");
 				request.addHeader("Content-Type", "application/xml");
