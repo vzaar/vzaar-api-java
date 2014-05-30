@@ -1,12 +1,12 @@
 package com.vzaar.test.junit;
 
-import static org.junit.Assert.*;
-
 import com.vzaar.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.Assert.fail;
 
 public class testGetVideoList {
 
@@ -14,7 +14,7 @@ public class testGetVideoList {
 
     @Before
     public void setUp() throws Exception {
-        api = new Vzaar(TestConf.API_USERNAME, TestConf.API_TOKEN);
+		api = new Vzaar(TestConf.API_USERNAME, TestConf.API_TOKEN);
     }
 
     @Test
