@@ -17,6 +17,7 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
@@ -217,7 +218,7 @@ public class Vzaar {
 		postData.append("</video></vzaar-api>");
 
 		//System.out.println(postData.toString());
-		String responseBody = getURLResponse(_url, true, "POST", postData.toString());
+		String responseBody = getURLResponse(_url, true, "PUT", postData.toString());
 
 		if ((null == responseBody) || (responseBody.length() == 0))
 			return false;
@@ -600,6 +601,16 @@ public class Vzaar {
 				request.setEntity(postData);
 				request.addHeader("User-agent", "Vzaar OAuth Client");
 //				request.addHeader("Connection", "close");
+				request.addHeader("Content-Type", "application/xml");
+				if (auth) consumer.sign(request);
+				ResponseHandler<String> responseHandler = new BasicResponseHandler();
+				responseBody = httpClient.execute(request, responseHandler);
+			} else if (method.equalsIgnoreCase("PUT")) {
+				System.out.println("Calling PUT getURLResponse...");
+				HttpPut request = new HttpPut(url);
+				StringEntity postData = new StringEntity(data);
+				request.setEntity(postData);
+				request.addHeader("User-agent", "Vzaar OAuth Client");
 				request.addHeader("Content-Type", "application/xml");
 				if (auth) consumer.sign(request);
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
