@@ -322,7 +322,7 @@ public class Vzaar {
 	 * @throws {@link Exception]}
 	 */
 	public boolean uploadSubtitle(SubtitleQuery query) throws Exception {
-		String _url = "http://vzaar.com/api/subtitle/upload.xml";
+		String _url = apiUrl + "api/subtitle/upload.xml";
 		StringBuilder postData = new StringBuilder();
 		postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><vzaar-api><subtitle><language>")
 				.append(query.language)
@@ -579,6 +579,49 @@ public class Vzaar {
 			}
 		}
 		return responseBody;
+	}
+	
+	
+	/**
+	 * 
+	 * @param query
+	 * @return   videoId
+	 * @throws Exception
+	 */
+	public Long uploadLink(UploadLinkQuery query)throws Exception{
+
+		String _url = apiUrl + "api/upload/link.xml";
+		Long videoId = null;
+		UploadSignature signature = getUploadSignature();
+		StringBuilder postData = new StringBuilder();
+
+		postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><vzaar-api><link_upload><key>")
+				.append(signature.key).append("</key>").append("<guid>").append(signature.guid).append("</guid>")
+				.append("<url>").append(query.url).append("</url>").append("<encoding_params>")
+				.append("<title>").append(query.title).append("</title>")
+				.append("<description>").append(query.description).append("</description>")
+				.append("<size_id>").append(query.size_id).append("</size_id>")
+				.append("<bitrate>").append(query.bitrate).append("</bitrate>")
+				.append("<width>").append(query.width).append("</width>")
+				.append("<transcoding>").append(query.transcoding).append("</transcoding>")
+				.append("</encoding_params></link_upload></vzaar-api>");
+
+		String responseBody = getURLResponse(_url, true, "POST", postData.toString());
+
+		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+		domFactory.setNamespaceAware(false);
+		InputSource is = new InputSource();
+		is.setCharacterStream(new StringReader(responseBody));
+		Document document;
+		try {
+			document = domFactory.newDocumentBuilder().parse(is);
+			XPath xpath = XPathFactory.newInstance().newXPath();
+			videoId = Long.valueOf((String) xpath.compile("//id/text()").evaluate(document, XPathConstants.STRING));
+		} catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+			e.printStackTrace();
+		}
+
+		return videoId;
 	}
 
 	private String getURLResponse(String url) {
