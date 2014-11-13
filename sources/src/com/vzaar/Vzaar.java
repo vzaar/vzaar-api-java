@@ -133,7 +133,7 @@ public class Vzaar {
 		String responseBody = getURLResponse(_url);
 		String error = checkError(responseBody);
 		if (null != error) throw new VzaarException(error);
-		System.out.println(responseBody);
+		//System.out.println(responseBody);
 		return AccountDetails.fromJson(responseBody);
 	}
 
@@ -172,7 +172,7 @@ public class Vzaar {
 			}
 		}
 		String responseBody = getURLResponse(_url);
-		System.out.println(responseBody);
+		//System.out.println(responseBody);
 		return Video.fromJson(new TypeReference<List<Video>>() {
 		}, responseBody);
 	}
@@ -191,7 +191,7 @@ public class Vzaar {
 		String responseBody = getURLResponse(_url);
 		String error = checkError(responseBody);
 		if (null != error) throw new VzaarException(error);
-		System.out.println(responseBody);
+		//System.out.println(responseBody);
 		VideoDetails videoDetails = VideoDetails.fromJson(responseBody);
 		videoDetails.poster = "http://view.vzaar.com/" + videoId + "/image";
 		return videoDetails;
@@ -238,10 +238,10 @@ public class Vzaar {
 		postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		postData.append("<vzaar-api><_method>delete</_method></video></vzaar-api>");
 
-		System.out.println(_url + "\n" + postData.toString());
+		//System.out.println(_url + "\n" + postData.toString());
 		String responseBody = getURLResponse(_url, true, "DELETE", postData.toString());
 
-		System.out.println(responseBody);
+		//System.out.println(responseBody);
 
 		int videoStatusId = 0;
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -332,9 +332,9 @@ public class Vzaar {
 				.append(query.body)
 				.append("</body></subtitle></vzaar-api>");
 
-		System.out.println(postData.toString());
+		//System.out.println(postData.toString());
 		String responseBody = getURLResponse(_url, true, "POST", postData.toString());
-		System.out.println(responseBody);
+		//System.out.println(responseBody);
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 		domFactory.setNamespaceAware(false);
 		InputSource is = new InputSource();
@@ -649,7 +649,7 @@ public class Vzaar {
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
 				responseBody = httpClient.execute(request, responseHandler);
 			} else if (method.equalsIgnoreCase("PUT")) {
-				System.out.println("Calling PUT getURLResponse...");
+				//System.out.println("Calling PUT getURLResponse...");
 				HttpPut request = new HttpPut(url);
 				StringEntity postData = new StringEntity(data);
 				request.setEntity(postData);
