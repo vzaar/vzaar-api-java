@@ -5,6 +5,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VideoDetails {
     public String version;
@@ -26,6 +28,7 @@ public class VideoDetails {
     public VideoDetailsThumbnail thumbnail;
     public VideoDetailsFramegrab framegrab;
     public VideoDetailsVideoStatus videoStatus;
+	public List<VideoRendition> renditions = new ArrayList<>();
 
     public VideoDetails() {
         author = new VideoDetailsAuthor();
@@ -76,6 +79,7 @@ public class VideoDetails {
                 ", thumbnail=" + thumbnail +
                 ", framegrab=" + framegrab +
                 ", videoStatus=" + videoStatus +
+				", renditions=" + renditions +
                 '}';
     }
 }

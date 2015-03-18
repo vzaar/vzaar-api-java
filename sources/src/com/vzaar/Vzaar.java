@@ -129,7 +129,7 @@ public class Vzaar {
 	 * @throws VzaarException
 	 */
 	public AccountDetails getAccountDetails(Integer accountId) throws VzaarException {
-		String _url = apiUrl + "/api/accounts/" + accountId + ".json";
+		String _url = apiUrl + "api/accounts/" + accountId + ".json";
 		String responseBody = getURLResponse(_url);
 		String error = checkError(responseBody);
 		if (null != error) throw new VzaarException(error);
@@ -187,7 +187,7 @@ public class Vzaar {
 	 * @throws {@link VzaarException}
 	 */
 	public VideoDetails getVideoDetails(Long videoId) throws VzaarException {
-		String _url = apiUrl + "/api/videos/" + videoId + ".json";
+		String _url = apiUrl + "api/videos/" + videoId + ".json";
 		String responseBody = getURLResponse(_url);
 		String error = checkError(responseBody);
 		if (null != error) throw new VzaarException(error);
