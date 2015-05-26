@@ -29,7 +29,7 @@ The very next thing you would want to do is to check if your account actually wo
 
 ```java
     Vzaar api = new Vzaar(args[0], args[1]);
-    String whoAmI = vzaarApi.whoAmI();
+    String whoAmI = api.whoAmI();
     if (whoAmI.length() != 0) 
     {
       System.out.println("WhoAmI - " + whoAmI + "\n");
