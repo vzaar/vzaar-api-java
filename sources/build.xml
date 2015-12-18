@@ -33,9 +33,7 @@
         <javac srcdir="${dir.src}"
                destdir="${dir.build.classes}"
                debug="on"
-               optimize="on"
-               nowarn="on"
-               target="1.7">
+               optimize="on">
             <classpath refid="path.lib"/>
         </javac>
     </target>
