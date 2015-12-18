@@ -82,6 +82,7 @@ crashlytics-build.properties
 .mtj.tmp/
 
 # Package Files #
+*.zip
 *.war
 *.ear
 
