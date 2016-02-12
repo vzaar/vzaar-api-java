@@ -1,0 +1,10 @@
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+#  - openjdk6
+
+before_script:
+  - cd sources
+
+script:
+  - ant dist
