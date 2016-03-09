@@ -1,4 +1,8 @@
-2015-01-14 JC <jozef@vzaar.com>
+[1.1.0] 2016-03-09 EV <evi@vzaar.com>
+
+	* update to support paging
+
+[1.0.0] 2015-01-14 JC <jozef@vzaar.com>
 	
 	* licence added
 	* changelog added

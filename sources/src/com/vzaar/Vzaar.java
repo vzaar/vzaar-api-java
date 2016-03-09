@@ -163,6 +163,8 @@ public class Vzaar {
 		else
 			_url += "&sort=desc";
 
+		_url += "&page=" + ((query.page >1)? query.page : 1);
+
 		if ((null != query.title) && (query.title.length() > 0)) {
 			try {
 				_url += "&title=" + URLEncoder.encode(query.title, "UTF-8");
