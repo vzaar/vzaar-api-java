@@ -69,12 +69,9 @@ Result of this call will be an object of AccountDetails type.
 >This API call returns a list of the user's active videos along with it's relevant metadata. 20 videos are returned by default but this is customizable.
 
 ```java
-VideoListQuery query = new VideoListQuery
-{
-	count = 10,
-	page = 1
-};
-
+VideoListQuery query = new VideoListQuery;
+query.count = 10;
+query.page = 1;
 List<Video> list = api.getVideoList(query);
 ```
 
