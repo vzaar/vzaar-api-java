@@ -266,7 +266,7 @@ public class Vzaar {
 	 */
 
 	public Long processVideo(VideoProcessQuery videoProcessQuery) {
-		String _url = apiUrl + "api/videos";
+		String _url = apiUrl + "api/v1.1/videos";
 		Long videoId = null;
 		StringBuilder postData = new StringBuilder();
 		postData.append("<vzaar-api><video>");
@@ -287,6 +287,9 @@ public class Vzaar {
 					.append("</labels>");
 		}
 		postData.append("<profile>").append(videoProcessQuery.profile).append("</profile>");
+		if(videoProcessQuery.chunks >0 ){
+			postData.append("<chunks>").append(videoProcessQuery.chunks).append("</chunks>");
+		}
 		if (videoProcessQuery.transcode)
 			postData.append("<transcoding>true</transcoding>");
 		postData.append("</video></vzaar-api>");
@@ -350,12 +353,29 @@ public class Vzaar {
 	 * @return Returns object of type {@link UploadSignature}
 	 */
 	public UploadSignature getUploadSignature() {
-		String _url = apiUrl + "api/videos/signature";
+		return getUploadSignature(false);
+	}
+
+	/**
+	 * Get Upload Signature
+	 *
+	 * @param multipart In case if you are using multipart upload
+	 * @return Returns object of type {@link UploadSignature}
+	 */
+	public UploadSignature getUploadSignature(boolean multipart) {
+		String _url = apiUrl + "api/v1.1/videos/signature";
 		UploadSignature signature = null;
 		if (enableFlashSupport) {
 			_url += "?flash_request=true";
 		}
 
+		if(multipart){
+			if(enableFlashSupport){
+				_url += "&multipart=true";
+			}else {
+				_url += "?multipart=true";
+			}
+		}
 		String responseBody = getURLResponse(_url);
 		signature = new UploadSignature(responseBody);
 		return signature;
