@@ -8,4 +8,5 @@ public class VideoProcessQuery {
     public VideoProfile profile = VideoProfile.ORIGINAL;
     public boolean transcode = false;
     public String replaceId = "";
+    public int chunks = 0;
 }
