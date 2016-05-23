@@ -31,6 +31,8 @@ public class UploadSignature {
     public String accessKeyId;
     public String policy;
     public boolean https;
+    public String uploadHostname;
+    public String chunkSize;
 
     public UploadSignature(String response) {
         try {
@@ -54,6 +56,8 @@ public class UploadSignature {
             //2014-04-13T20:43:05.000Z
             expirationDate = simpleDateFormat.parse((String) xpath.compile("/vzaar-api/expirationdate/text()").evaluate(document, XPathConstants.STRING));
             signature = (String) xpath.compile("/vzaar-api/signature/text()").evaluate(document, XPathConstants.STRING);
+            uploadHostname = (String) xpath.compile("/vzaar-api/upload_hostname/text()").evaluate(document, XPathConstants.STRING);
+            chunkSize = (String) xpath.compile("/vzaar-api/chunk_size/text()").evaluate(document, XPathConstants.STRING);
 
             _toJson = new Gson().toJson(this);
 
@@ -85,5 +89,20 @@ public class UploadSignature {
         return _toJson;
     }
 
-
+    @Override
+    public String toString() {
+        return "UploadSignature{" +
+                "guid=" + this.guid +
+                ", bucket=" + bucket +
+                ", expirationDate=" + expirationDate +
+                ", signature=" + signature +
+                ", acl=" + acl +
+                ", key=" + key +
+                ", accessKeyId=" + accessKeyId +
+                ", policy=" + policy +
+                ", https=" + https +
+                ", uploadHostname=" + uploadHostname +
+                ", chunkSize=\'" + chunkSize + "\'" +
+                "}";
+    }
 }

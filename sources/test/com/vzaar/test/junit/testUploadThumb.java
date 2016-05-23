@@ -1,12 +1,9 @@
 package com.vzaar.test.junit;
 
-import com.vzaar.Video;
 import com.vzaar.Vzaar;
 import com.vzaar.VzaarException;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.fail;
 
@@ -16,7 +13,6 @@ public class testUploadThumb {
 	@Before
 	public void setUp() throws Exception {
 		api = new Vzaar(TestConf.API_USERNAME, TestConf.API_TOKEN);
-		//api = new Vzaar("ahmetunal", "GETUGkPFNC84JlzXkOMSYQFTOCAixOIiroh7oUj3k");
 	}
 	@Test
 	public void test() {
@@ -35,7 +31,7 @@ public class testUploadThumb {
 
 		try
 		{
-			String path = "D:\\_githubVzaar\\movie\\test.jpg";
+			String path = "D:\\somepath\\to\\test.jpg";
 			int videoId = 1628671;
 			uploadThumb = api.uploadThumbnail((long)videoId, path);
 
