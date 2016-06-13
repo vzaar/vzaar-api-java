@@ -1,16 +1,11 @@
 package com.vzaar.test.junit;
 
 import static org.junit.Assert.*;
-
-import java.math.BigInteger;
 import java.util.List;
 
 import com.vzaar.*;
 import org.junit.Before;
 import org.junit.Test;
-
-//import com.vzaar.VideoList;
-
 
 public class testDeleteVideo {
 

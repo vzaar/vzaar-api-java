@@ -51,7 +51,8 @@ public class Vzaar {
 	public boolean enableFlashSupport = false;
 	public String apiUrl = "https://vzaar.com/";
 	public int bufferSize = 131072; //128Kb
-
+	public static final String uploader = "java-1.2.0";
+	public static final String version = "1.2.0";
 	private OAuthConsumer consumer;
 
 	/**
@@ -107,7 +108,7 @@ public class Vzaar {
 	 *
 	 * @param userName It is the vzaar login name for the user. Note: This must be the userName and not the email address
 	 * @return Returns object of type {@link com.vzaar.UserDetails}
-	 * @throws {@link         VzaarException}
+	 * @throws {@link VzaarException}
 	 * @throws VzaarException
 	 */
 	public UserDetails getUserDetails(String userName) throws VzaarException {
@@ -125,7 +126,7 @@ public class Vzaar {
 	 *
 	 * @param accountId Integer Account id of the user. It can be retrieved via the getUserDetails() api.
 	 * @return Returns object of type {@link com.vzaar.AccountDetails}
-	 * @throws {@link         VzaarException}
+	 * @throws {@link VzaarException}
 	 * @throws VzaarException
 	 */
 	public AccountDetails getAccountDetails(Integer accountId) throws VzaarException {
@@ -350,146 +351,105 @@ public class Vzaar {
 	/**
 	 * Get Upload Signature
 	 *
+	 * @param query Object of type {@link UploadSignatureQuery}
 	 * @return Returns object of type {@link UploadSignature}
+	 * @throws VzaarException
 	 */
-	public UploadSignature getUploadSignature() {
-		return getUploadSignature(false);
-	}
-
-	/**
-	 * Get Upload Signature
-	 *
-	 * @param multipart In case if you are using multipart upload
-	 * @return Returns object of type {@link UploadSignature}
-	 */
-	public UploadSignature getUploadSignature(boolean multipart) {
+	public UploadSignature getUploadSignature(UploadSignatureQuery query) throws VzaarException{
 		String _url = apiUrl + "api/v1.1/videos/signature";
+
+		if((query.path == null || query.path.isEmpty()) && (query.url == null || query.url.isEmpty())){
+			throw new VzaarException("path or url must be provided");
+		}
+		if(query.path != null && !query.path.isEmpty()){
+			_url += "?path=" + query.path;
+
+			if((null != query.filename) && (query.filename.length() > 0)){
+				_url+= "&filename=" + query.filename;
+			}
+			if(query.fileSize > 0){
+				_url+= "&filesize=" + query.fileSize;
+			}
+		}else{
+			_url +="?url=" + query.url;
+		}
 		UploadSignature signature = null;
+
 		if (enableFlashSupport) {
-			_url += "?flash_request=true";
+			_url += "&flash_request=true";
 		}
 
-		if(multipart){
-			if(enableFlashSupport){
-				_url += "&multipart=true";
-			}else {
-				_url += "?multipart=true";
-			}
+		if ((null != query.redirectUrl) && (query.redirectUrl.length() > 0)) {
+			_url += "&success_action_redirect=" + query.redirectUrl;
 		}
+
+		if(query.multipart){
+			_url += "&multipart=true";
+			_url += "&uploader=" + uploader;
+		}
+
 		String responseBody = getURLResponse(_url);
 		signature = new UploadSignature(responseBody);
 		return signature;
 	}
 
 	/**
-	 * Get Upload Signature
+	 * Upload video from local drive directly in one chunk
 	 *
-	 * @param redirectUrl In case if you are using redirection after your upload, specify redirect URL
-	 * @return Returns object of type {@link UploadSignature}
-	 */
-	public UploadSignature getUploadSignature(String redirectUrl) {
-		String _url = apiUrl + "api/videos/signature";
-		UploadSignature signature = null;
-		if (enableFlashSupport) {
-			_url += "?flash_request=true";
-		}
-		if ((null != redirectUrl) && (redirectUrl.length() > 0)) {
-			if (enableFlashSupport) {
-				_url += "&success_action_redirect=" + redirectUrl;
-			} else {
-				_url += "?success_action_redirect=" + redirectUrl;
-			}
-		}
-
-		String responseBody = getURLResponse(_url);
-		signature = new UploadSignature(responseBody);
-		return signature;
-	}
-
-	/**
-	 * Upload video from InputStream directly to Amazon S3 bucket
-	 *
-	 * @param in            InputStream of the file to be uploaded
-	 * @param fileName      Name of the file
-	 * @param contentLength Content Length
-	 * @param listener      Object implementing {@link ProgressListener} interface, to get the upload status
-	 * @return string GUID of the file uploaded
-	 * @throws {@link Exception]}
-	 */
-
-
-	public String uploadVideo(InputStream in, String fileName, long contentLength, ProgressListener listener) throws Exception {
-		UploadSignature signature = getUploadSignature();
-		String _url = "https://" + signature.bucket + ".s3.amazonaws.com/";
-		String guid = null;
-		if (null == consumer)
-			setAuth();
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		httpClient.removeRequestInterceptorByClass(RequestExpectContinue.class);
-		String responseBody = new String();
-
-		HttpPost request = new HttpPost(_url);
-
-		if ((null != in) && (null != fileName) && (1 <= contentLength)) {
-			ContentBody body = new FileStreamingBody(in, fileName, contentLength, bufferSize);
-
-			request.addHeader("User-agent", "Vzaar API Client");
-			request.addHeader("x-amz-acl", signature.acl);
-			request.addHeader("Enclosure-Type", "multipart/form-data");
-
-			CountingMultiPartEntity entity = new CountingMultiPartEntity(listener);
-
-			entity.addPart("AWSAccessKeyId", new StringBody(signature.accessKeyId));
-			entity.addPart("Signature", new StringBody(signature.signature));
-			entity.addPart("acl", new StringBody(signature.acl));
-			entity.addPart("bucket", new StringBody(signature.bucket));
-			entity.addPart("policy", new StringBody(signature.policy));
-			entity.addPart("success_action_status", new StringBody("201"));
-			entity.addPart("key", new StringBody(signature.key));
-			entity.addPart("file", body);
-
-			request.setEntity(entity);
-
-			HttpResponse response = httpClient.execute(request);
-			responseBody = EntityUtils.toString(response.getEntity());
-
-			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-			domFactory.setNamespaceAware(false);
-			InputSource is = new InputSource();
-			is.setCharacterStream(new StringReader(responseBody));
-			Document document = domFactory.newDocumentBuilder().parse(is);
-
-			XPath xpath = XPathFactory.newInstance().newXPath();
-			String postResponseKey = (String) xpath.compile("/PostResponse/Key/text()").evaluate(document, XPathConstants.STRING);
-			if (postResponseKey.length() > 0) {
-				String[] exploded = postResponseKey.split("/");
-				guid = exploded[exploded.length - 2];
-			} else {
-				throw new VzaarException(responseBody);
-			}
-		}
-		return guid;
-	}
-
-	/**
-	 * Upload video from local drive directly to Amazon S3 bucket
-	 *
-	 * @param path     Path of the video file to be uploaded
+	 * @param path Path of the video file to be uploaded
+	 * @param signature Object of type {@link UploadSignature}
 	 * @param listener Object implementing {@link ProgressListener} interface, to get the upload status
 	 * @return string GUID of the file uploaded
 	 * @throws {@link Exception]}
 	 */
-	public String uploadVideo(String path, ProgressListener listener) throws Exception {
+	private String simpleUpload(String path, UploadSignature signature, ProgressListener listener) throws Exception {
 		File file = new File(path);
 		if (file.exists()) {
 			long contentLength = file.length();
-			return uploadVideo(new FileInputStream(file), path, contentLength, listener);
+			return uploadVideo(new FileInputStream(file), file.getName(), contentLength, 0, 0, signature, listener);
 		}
 		return null;
 	}
 
 	/**
-	 * Upload video from local drive directly to Amazon S3 bucket
+	 * Upload video from local drive in multiple chunks
+	 *
+	 * @param path Path of the video file to be uploaded
+	 * @param signature Object of type {@link UploadSignature}
+	 * @param listener Object implementing {@link ProgressListener} interface, to get the upload status
+	 * @return string GUID of the file uploaded
+	 * @throws {@link Exception]}
+	 */
+    private String multipartUpload(String path, UploadSignature signature, ProgressListener listener) throws Exception {
+        File file = new File(path);
+        String guid = null;
+        if (file.exists()) {
+            InputStream is = new FileInputStream(file);
+
+            byte[] b = new byte[(int)chunkSyzeInBytes(signature.chunkSize)];
+            int chunk = 0;
+            int chunks = (int) Math.ceil((double)file.length() / (double)chunkSyzeInBytes(signature.chunkSize));
+            long contentLength;
+            while((contentLength = is.read(b)) !=-1){
+				byte[] temp;
+				if(contentLength != b.length){
+					temp =  new byte[(int)contentLength];
+					for(int i = 0; i<contentLength; i++){
+						temp[i] = b[i];
+					}
+				}else {
+					temp = b;
+				}
+
+                guid = uploadVideo(new ByteArrayInputStream(temp), file.getName(), contentLength, chunks, chunk, signature, listener);
+                chunk++;
+            }
+        }
+        return guid;
+    }
+
+	/**
+	 * Upload video from local drive to vzaar upload host
 	 *
 	 * @param path Path of the video file to be uploaded
 	 * @return string GUID of the file uploaded
@@ -497,13 +457,132 @@ public class Vzaar {
 	 */
 	public String uploadVideo(String path) throws Exception {
 		File file = new File(path);
+
+        UploadSignatureQuery query = new UploadSignatureQuery();
+        query.path = URLEncoder.encode(path, "UTF-8");
 		if (file.exists()) {
-			long contentLength = file.length();
-			return uploadVideo(new FileInputStream(file), path, contentLength, null);
+            query.fileSize = file.length();
+            query.filename = URLEncoder.encode(file.getName(), "UTF-8");
+            query.multipart = true;
+
+            UploadSignature signature = getUploadSignature(query);
+
+            if(signature.chunkSize != null && signature.chunkSize.length() >0){
+                return multipartUpload(path, signature, null);
+			}else {
+                return simpleUpload(path, signature, null);
+            }
 		}
 		return null;
 	}
 
+	/**
+	 * Upload video from local drive to vzaar upload host
+	 *
+	 * @param path Path of the video file to be uploaded
+	 * @param listener Object implementing {@link ProgressListener} interface, to get the upload status
+	 * @return string GUID of the file uploaded
+	 * @throws {@link Exception]}
+	 */
+	public String uploadVideo(String path, ProgressListener listener) throws Exception {
+		File file = new File(path);
+
+		UploadSignatureQuery query = new UploadSignatureQuery();
+		query.path = URLEncoder.encode(path, "UTF-8");
+		if (file.exists()) {
+			query.fileSize = file.length();
+			query.filename = URLEncoder.encode(file.getName(), "UTF-8");
+			query.multipart = true;
+
+			UploadSignature signature = getUploadSignature(query);
+
+			if(signature.chunkSize != null && signature.chunkSize.length() >0){
+				return multipartUpload(path, signature, listener);
+			}else {
+				return simpleUpload(path, signature, listener);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 *Upload video from InputStream to vzaar upload host
+	 *
+	 * @param in InputStream of chunk being uploaded
+	 * @param fileName Name of the file being uploaded
+	 * @param contentLength Length of the current chunk
+	 * @param chunks total number of chunks
+	 * @param chunk Current chunk beeing uploaded
+	 * @param signature Object of type {@link UploadSignature}
+	 * @param listener Object implementing {@link ProgressListener} interface, to get the upload status
+	 * @return string GUID of the file uploaded
+	 * @throws Exception
+	 */
+    private String uploadVideo(InputStream in, String fileName, long contentLength, int chunks, int chunk, UploadSignature signature, ProgressListener listener) throws Exception {
+        String _url = signature.uploadHostname;
+        String guid = null;
+        if (null == consumer)
+            setAuth();
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        httpClient.removeRequestInterceptorByClass(RequestExpectContinue.class);
+        String responseBody = new String();
+
+        HttpPost request = new HttpPost(_url);
+
+        if ((null != in) && (null != fileName) && (1 <= contentLength)) {
+            ContentBody body = new FileStreamingBody(in, fileName + "." +chunk, contentLength, bufferSize);
+
+            request.addHeader("User-agent", "Vzaar API Client");
+            request.addHeader("x-amz-acl", signature.acl);
+            request.addHeader("Enclosure-Type", "multipart/form-data");
+
+            CountingMultiPartEntity entity = new CountingMultiPartEntity(listener);
+
+            entity.addPart("AWSAccessKeyId", new StringBody(signature.accessKeyId));
+            entity.addPart("Signature", new StringBody(signature.signature));
+            entity.addPart("acl", new StringBody(signature.acl));
+            entity.addPart("bucket", new StringBody(signature.bucket));
+            entity.addPart("policy", new StringBody(signature.policy));
+            entity.addPart("success_action_status", new StringBody("201"));
+            String key = signature.key;
+            if(chunks>0){
+                key = signature.key.replace("${filename}", fileName) + "." + String.valueOf(chunk);
+            }
+            entity.addPart("key", new StringBody(key));
+            entity.addPart("chunks", new StringBody(String.valueOf(chunks)));
+            entity.addPart("chunk", new StringBody(String.valueOf(chunk)));
+            entity.addPart("x-amz-meta-uploader", new StringBody(uploader));
+            entity.addPart("file", body);
+            request.setEntity(entity);
+            HttpResponse response = httpClient.execute(request);
+            responseBody = EntityUtils.toString(response.getEntity());
+
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+            domFactory.setNamespaceAware(false);
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(responseBody));
+            Document document = domFactory.newDocumentBuilder().parse(is);
+
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            String postResponseKey = (String) xpath.compile("/PostResponse/Key/text()").evaluate(document, XPathConstants.STRING);
+            if (postResponseKey.length() > 0) {
+                String[] exploded = postResponseKey.split("/");
+                guid = exploded[exploded.length - 2];
+            } else {
+                throw new VzaarException(responseBody);
+            }
+        }
+        return guid;
+    }
+
+	/**
+	 *Generate thumbnail from specific time frame
+	 *
+	 * @param videoId It is the vzaar video number for that video available in {@link Video}
+	 * @param thumbTime Time for the frame
+	 * @return string Status
+	 * @throws Exception
+	 */
 	public String generateThumbnail(Long videoId, int thumbTime) throws Exception {
 		String _url = apiUrl + "api/videos/" + videoId + "/generate_thumb.xml";
 		StringBuilder postData = new StringBuilder();
@@ -534,6 +613,8 @@ public class Vzaar {
 	}
 
 	/**
+	 * Upload thumbnail from local drive
+	 *
 	 * @param videoId It is the vzaar video number for that video available in {@link Video}
 	 * @param path    Path of the video file to be uploaded
 	 */
@@ -600,7 +681,10 @@ public class Vzaar {
 
 		String _url = apiUrl + "api/upload/link.xml";
 		Long videoId = null;
-		UploadSignature signature = getUploadSignature();
+		UploadSignatureQuery uploadSignatureQuery = new UploadSignatureQuery();
+		uploadSignatureQuery.url = query.url;
+		uploadSignatureQuery.multipart = true;
+		UploadSignature signature = getUploadSignature(uploadSignatureQuery);
 		StringBuilder postData = new StringBuilder();
 
 		postData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><vzaar-api><link_upload><key>")
@@ -690,5 +774,20 @@ public class Vzaar {
 			return (String) map.get("error");
 		}
 		return null;
+	}
+
+	private static long chunkSyzeInBytes(String str){
+
+		int index = str.toLowerCase().indexOf("mb");
+
+		String num = str.substring(0, index);
+		int number;
+		try{
+			number = Integer.parseInt(num);
+		}catch (NumberFormatException e) {
+			number = 0;
+		}
+
+		return (long)(number * Math.pow(1024.0, 2.0));
 	}
 }
