@@ -87,11 +87,34 @@ Where _VZAAR_VIDEO_ID_ is unique vzaar video ID assigned to a video after its pr
 
 ####Upload Signature
 
->In some cases you might need to not perform actual uploading from API but to use some third-party uploaders, like S3_Upload widget, or any other, so you would need to get only upload signature for it, so now you can have it as UploadSignature object, as XML string, as XmlDocument or as JSON string:
+>In some cases you might need to not perform actual uploading from API but to use some third-party uploaders, like S3_Upload widget, or any other, so you would need to get only upload signature for it, so now you can have it as UploadSignature object, as XML string, as XmlDocument or as JSON string.
 
 ```java
-String jsonStringSignature = api.getUploadSignature().toJson();
+UploadSignature signature = null;
+UploadSignatureQuery query = new UploadSignatureQuery();
+
+query.path =  URLEncoder.encode("/path/to/file/video.mp4", "UTF-8");
+query.filename = URLEncoder.encode("video.mp4", "UTF-8");
+query.fileSize = 465756543;
+query.multipart = true;
+
+signature = api.getUploadSignature(query);
+
+System.out.println("Upload Signature - " + signature.toString());
 ```
+
+UploadSignatureQuery has the following parameters:
+
+- _redirectUrl_ - post upload redirection URL
+- _multipart_ - true|false, enables or disables multipart upload support
+- _path_ - local path of the video file to be uploaded
+- _url_ - remote path of the video file to be uploaded
+- _filename_ - basename of file being uploaded
+- _filesize_ - size in bytes of file being uploaded
+
+In _UploadSignatureQuery_ path or url are parameters mandatory, if either of them used it will throw an error. _url_ parameter used to upload from URL and _path_ to upload from the local storage.
+
+Both _filesize_ and _filename_ are mandatory in order to initiate the c orrect S3 multipart upload, although no exception will be raised from the API if either is missing. In the case of either of these parameters being missing, no errors will be raised but video processing will be significantly slower, especially for large files.
 
 ####Uploading video
 
