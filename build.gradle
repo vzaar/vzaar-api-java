@@ -1,0 +1,90 @@
+import org.gradle.api.artifacts.maven.MavenDeployment
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+apply plugin: 'checkstyle'
+
+group = 'com.vzaar'
+version = '2.0.0'
+
+signing {
+    required { gradle.taskGraph.hasTask('uploadArchives') }
+    sign configurations.archives
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	testCompile 'junit:junit:4.12'
+  testCompile 'org.mockito:mockito-all:1.10.19'
+  checkstyle('com.puppycrawl.tools:checkstyle:6.7')
+}
+
+checkstyle {
+    configFile = new File(rootDir, "config/checkstyle/checkstyle.xml")
+    showViolations = false
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from tasks.javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+boolean release = true
+String snapshotUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
+String stagingUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+//version = version += (release ? '' : '-SNAPSHOT')
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: (release ? stagingUrl : snapshotUrl)) {
+              authentication(userName: {sonatypeUsername}, password: {sonatypePassword})
+            }
+
+            pom.project {
+               name 'vzaar-sdk-java'
+               packaging 'jar'
+               description 'Vzaar Client SDK'
+               url 'https://github.com/nine-lives/vzaar-sdk-java'
+
+               scm {
+                   url 'scm:git@github.com:nine-lives/vzaar-sdk-java.git'
+                   connection 'scm:git@github.com:nine-lives/vzaar-sdk-java.git'
+                   developerConnection 'scm:git@github.com:nine-lives/vzaar-sdk-java.git'
+               }
+
+               licenses {
+                   license {
+                       name 'The MIT License (MIT)'
+                       url 'https://raw.githubusercontent.com/nine-lives/vzaar-sdk-java/master/LICENSE'
+                       distribution 'repo'
+                   }
+               }
+
+               developers {
+                   developer {
+                       id 'mgsmith57'
+                       name 'Marc G. Smith'
+                   }
+               }
+           }
+        }
+    }
+}
