@@ -1,6 +1,6 @@
 package com.vzaar.util
 
-import com.vzaar.VideoListRequest
+import com.vzaar.VideoPageRequest
 import com.vzaar.VideoState
 import spock.lang.Specification
 
@@ -10,7 +10,7 @@ class RequestParameterMapperSpec extends Specification {
 
     def "I can get a map of the request parameters"() {
         given:
-        VideoListRequest request = new VideoListRequest()
+        VideoPageRequest request = new VideoPageRequest()
                 .withQuery("query")
                 .withResultsPerPage(5)
                 .withState(VideoState.failed)
@@ -26,7 +26,7 @@ class RequestParameterMapperSpec extends Specification {
 
     def "I can write to query parameters"() {
         given:
-        VideoListRequest request = new VideoListRequest()
+        VideoPageRequest request = new VideoPageRequest()
                 .withQuery("query")
                 .withResultsPerPage(5)
                 .withState(VideoState.failed)
@@ -39,7 +39,7 @@ class RequestParameterMapperSpec extends Specification {
 
     def "Query parameters is empty string if no values are set"() {
         given:
-        VideoListRequest request = new VideoListRequest()
+        VideoPageRequest request = new VideoPageRequest()
 
         when:
         String query = mapper.write(request)
@@ -53,7 +53,7 @@ class RequestParameterMapperSpec extends Specification {
         String query = "https://api.vzaar.com/api/v2/videos?q=query&state=failed&per_page=5&nonexisting=false"
 
         when:
-        VideoListRequest request = mapper.read(new URL(query), VideoListRequest);
+        VideoPageRequest request = mapper.read(new URL(query), VideoPageRequest);
         Map<String, String> parameters = new RequestParameterMapper().writeToMap(request)
 
         then:
@@ -68,7 +68,7 @@ class RequestParameterMapperSpec extends Specification {
         String query = "https://api.vzaar.com/api/v2/videos?q=query&state=failed&per_page=5&nonexisting=false"
 
         when:
-        VideoListRequest request = mapper.read(new URL(query), VideoListRequest);
+        VideoPageRequest request = mapper.read(new URL(query), VideoPageRequest);
         request.withState(VideoState.ready)
         request.withResultsPerPage(4)
         Map<String, String> parameters = new RequestParameterMapper().writeToMap(request)

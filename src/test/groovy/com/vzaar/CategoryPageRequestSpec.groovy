@@ -3,13 +3,13 @@ package com.vzaar
 import com.vzaar.util.RequestParameterMapper
 import spock.lang.Specification
 
-class CategoryListRequestSpec extends Specification {
+class CategoryPageRequestSpec extends Specification {
 
     private final RequestParameterMapper mapper = new RequestParameterMapper();
 
     def "I can get a map of the request parameters"() {
         given:
-        CategoryListRequest request = new CategoryListRequest()
+        CategoryPageRequest request = new CategoryPageRequest()
                 .withLevels(2)
                 .withIds([10, 11, 12])
                 .withResultsPerPage(5)
@@ -25,7 +25,7 @@ class CategoryListRequestSpec extends Specification {
 
     def "I can write to query parameters"() {
         given:
-        CategoryListRequest request = new CategoryListRequest()
+        CategoryPageRequest request = new CategoryPageRequest()
                 .withLevels(2)
                 .withIds([10, 11, 12])
                 .withResultsPerPage(5)
@@ -39,7 +39,7 @@ class CategoryListRequestSpec extends Specification {
 
     def "Query parameters is empty string if no values are set"() {
         given:
-        CategoryListRequest request = new CategoryListRequest()
+        CategoryPageRequest request = new CategoryPageRequest()
 
         when:
         String query = mapper.write(request)
@@ -50,25 +50,26 @@ class CategoryListRequestSpec extends Specification {
 
     def "I can convert a query string back to a request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/categories?levels=2&ids=10%2C11%2C12&per_page=5"
+        String query = "https://api.vzaar.com/api/v2/categories?levels=2&ids%5B%5D=3445&ids%5B%5D=3446&page=2&per_page=1"
 
         when:
-        CategoryListRequest request = mapper.read(new URL(query), CategoryListRequest);
+        CategoryPageRequest request = mapper.read(new URL(query), CategoryPageRequest);
         Map<String, String> parameters = new RequestParameterMapper().writeToMap(request)
 
         then:
         parameters['levels'] == "2"
-        parameters['per_page'] == "5"
-        parameters['ids'] == "10,11,12"
-        parameters.size() == 3
+        parameters['per_page'] == "1"
+        parameters['page'] == "2"
+        parameters['ids'] == "3445,3446"
+        parameters.size() == 4
     }
 
     def "I can modify a mapped request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/categories?levels=2&ids=10%2C11%2C12&per_page=5"
+        String query = "https://api.vzaar.com/api/v2/categories?levels=2&ids%5B%5D=3445&ids%5B%5D=3446&per_page=5"
 
         when:
-        CategoryListRequest request = mapper.read(new URL(query), CategoryListRequest);
+        CategoryPageRequest request = mapper.read(new URL(query), CategoryPageRequest);
         request.withLevels(5)
         request.withIds([55])
         Map<String, String> parameters = new RequestParameterMapper().writeToMap(request)

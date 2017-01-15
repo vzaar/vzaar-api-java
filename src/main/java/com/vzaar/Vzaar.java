@@ -27,31 +27,14 @@ public final class Vzaar {
         return new Vzaar(configuration);
     }
 
-    public boolean isApiVersionDeprecated() {
-        return client.getLastResponseHeaders().isApiVersionDeprecated();
+    public ApiVersioning getApiVersioning() {
+        return new ApiVersioning(client.getLastResponseHeaders());
+    }
+    public RateLimits getRateLimits() {
+        return new RateLimits(client.getLastResponseHeaders());
     }
 
-    public String getApiVersionSunsetDate() {
-        return client.getLastResponseHeaders().getApiVersionSunsetDate();
-    }
-
-    public int getRateLimit() {
-        return client.getLastResponseHeaders().getRateLimit();
-    }
-
-    public int getRateLimitRemaining() {
-        return client.getLastResponseHeaders().getRateLimitRemaining();
-    }
-
-    public long getRateLimitWindowResetTimestamp() {
-        return client.getLastResponseHeaders().getRateLimitWindowResetTimestamp();
-    }
-
-    public String getRateLimitWindowResetIn() {
-        return client.getLastResponseHeaders().getRateLimitWindowResetIn();
-    }
-
-    public Page<Video> videos(VideoListRequest request) {
+    public Page<Video> videos(VideoPageRequest request) {
         return client.resource("videos", Video.class).page(request);
     }
 
@@ -59,11 +42,11 @@ public final class Vzaar {
         return client.resource("videos", Video.class).lookup(videoId);
     }
 
-    public Page<Category> categories(CategoryListRequest request) {
+    public Page<Category> categories(CategoryPageRequest request) {
         return client.resource("categories", Category.class).page(request);
     }
 
-    public Page<Category> categories(int categoryId, CategoryListRequest request) {
+    public Page<Category> categories(int categoryId, CategoryPageRequest request) {
         return client.resource("categories", Category.class).id(categoryId).action("subtree").page(request);
     }
 
@@ -71,56 +54,31 @@ public final class Vzaar {
         return client.resource("categories", Category.class).lookup(categoryId);
     }
 
-    public Page<EncodingPreset> encodingPresets(EncodingPresetListRequest request) {
+    public Page<IngestRecipe> recipes(IngestRecipePageRequest request) {
+        return client.resource("ingest_recipes", IngestRecipe.class).page(request);
+    }
+
+    public IngestRecipe recipe(int recipeId) {
+        return client.resource("ingest_recipes", IngestRecipe.class).lookup(recipeId);
+    }
+
+    public IngestRecipe createRecipe(IngestRecipeStoreRequest request) {
+        return client.resource("ingest_recipes", IngestRecipe.class).create(request);
+    }
+
+    public IngestRecipe updateRecipe(int recipeId, IngestRecipeStoreRequest request) {
+        return client.resource("ingest_recipes", IngestRecipe.class).id(recipeId).update(request);
+    }
+
+    public void deleteRecipe(int recipeId) {
+        client.resource("ingest_recipes", IngestRecipe.class).id(recipeId).delete();
+    }
+
+    public Page<EncodingPreset> encodingPresets(EncodingPresetPageRequest request) {
         return client.resource("encoding_presets", EncodingPreset.class).page(request);
     }
 
     public EncodingPreset encodingPreset(int encodingPresetId) {
         return client.resource("encoding_presets", EncodingPreset.class).lookup(encodingPresetId);
-    }
-
-    public static void main(String[] args) {
-        try {
-            Vzaar vzaar = Vzaar.make("java-equals-pain", "PwKjaD45J9d2hwjc9rFp");
-            Page<Category> list = vzaar.categories(3446, new CategoryListRequest().withLevels(2));
-            System.out.println(list.getMeta().getTotalCount());
-            for (Category category : list.getData()) {
-                System.out.println(category.getName() + " " + category.getId());
-            }
-
-            Category category = vzaar.category(3446);
-            System.out.println(category.getName());
-
-        } catch (VzaarServerException e) {
-            System.out.println(e.getStatusCode() + ": " + e.getMessage());
-            for (VzaarError vzaarError : e.getErrors()) {
-                System.out.println(vzaarError.getMessage());
-                System.out.println(vzaarError.getDetail());
-            }
-        }
-
-//        try {
-//            ObjectMapperFactory.setFailOnUnknownProperties(true);
-//            Vzaar vzaar = Vzaar.make("java-equals-pain", "PwKjaD45J9d2hwjc9rFp");
-////            Page<EncodingPreset> list = vzaar.encodingPresets(new EncodingPresetListRequest().withResultsPerPage(2));
-////            System.out.println(list.getMeta().getTotalCount());
-////            for (EncodingPreset preset : list.getData()) {
-////                System.out.println(preset.getName() + " " + preset.getId());
-////            }
-//
-//            EncodingPreset preset = vzaar.encodingPreset(2);
-//            System.out.println("Preset = " + preset.getName());
-//
-//            System.out.println(vzaar.getRateLimit());
-//            System.out.println(vzaar.getRateLimitRemaining());
-//            System.out.println(vzaar.getRateLimitWindowResetTimestamp());
-//            System.out.println(vzaar.getRateLimitWindowResetIn());
-//        } catch (VzaarServerException e) {
-//            System.out.println(e.getStatusCode() + ": " + e.getMessage());
-//            for (VzaarError vzaarError : e.getErrors()) {
-//                System.out.println(vzaarError.getMessage());
-//                System.out.println(vzaarError.getDetail());
-//            }
-//        }
     }
 }

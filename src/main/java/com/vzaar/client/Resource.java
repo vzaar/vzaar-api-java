@@ -17,7 +17,7 @@ public class Resource<T> {
     private Integer id;
     private String action;
     private Object params;
-    private String method;
+    private Object payload;
     private byte[] body;
 
     public Resource(RestClient client, Class<T> type) {
@@ -59,6 +59,32 @@ public class Resource<T> {
         } catch (IOException e) {
             throw new VzaarException(e);
         }
+    }
+
+    public T create(Object request) {
+        this.payload = request;
+        client.post(this, request);
+        try {
+            Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
+            return data.getData();
+        } catch (IOException e) {
+            throw new VzaarException(e);
+        }
+    }
+
+    public T update(Object request) {
+        this.payload = request;
+        client.patch(this, request);
+        try {
+            Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
+            return data.getData();
+        } catch (IOException e) {
+            throw new VzaarException(e);
+        }
+    }
+
+    public void delete() {
+        client.delete(this);
     }
 
     private JavaType wrapper(Class wrapperType) {
