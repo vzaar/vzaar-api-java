@@ -1,4 +1,11 @@
 language: java
 
+jdk:
+  - oraclejdk8
+
+env:
+  vzaarClientId: java-equals-pain
+
+
 before_install:
  - chmod +x gradlew
