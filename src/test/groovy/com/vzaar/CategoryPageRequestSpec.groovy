@@ -80,4 +80,12 @@ class CategoryPageRequestSpec extends Specification {
         parameters['ids'] == "55"
         parameters.size() == 3
     }
+
+    def "I get an error if the level is below 1"() {
+        when:
+        new CategoryPageRequest().withLevels(0)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
 }

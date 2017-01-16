@@ -10,7 +10,7 @@ public class RateLimits {
 
     private final Map<String, String> headers;
 
-    public RateLimits(Map headers) {
+    public RateLimits(Map<String, String> headers) {
         this.headers = headers;
     }
 

@@ -11,6 +11,7 @@ public class Video {
     private Integer userId;
     private Integer accountId;
     private String description;
+    private Double duration;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
     @JsonProperty(value = "private")
@@ -41,6 +42,10 @@ public class Video {
 
     public String getDescription() {
         return description;
+    }
+
+    public Double getDuration() {
+        return duration;
     }
 
     public ZonedDateTime getCreatedAt() {
