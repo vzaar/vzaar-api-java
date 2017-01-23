@@ -13,14 +13,21 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
     def "I can create a single part signature with all the request fields"() {
         given:
         CreateSignatureRequest request = new CreateSignatureRequest()
-                .withFilename("my_video")
+                .withFilename("my_video.mp4")
                 .withUploader("vzaar-java-sdk 1.0")
                 .withFilesize(NOT_QUITE_5GB)
 
         when:
-        UploadSignature signature = vzaar.signature(UploadType.single, request).uploadSignature;
+        UploadRequest uploadRequest = vzaar.signature(UploadType.single, request)
+        UploadSignature signature = uploadRequest.uploadSignature;
 
         then:
+        uploadRequest.type == UploadType.single
+        uploadRequest.createSignatureRequest.filename == 'my_video.mp4'
+        uploadRequest.createSignatureRequest.filesize == NOT_QUITE_5GB
+        uploadRequest.createSignatureRequest.uploader == 'vzaar-java-sdk 1.0'
+
+
         signature.accessKeyId ==~ /[A-Z0-9]{20,}/
         signature.key ==~ /vzaar\/.+\/\$\{filename\}/
         signature.acl == 'private'
