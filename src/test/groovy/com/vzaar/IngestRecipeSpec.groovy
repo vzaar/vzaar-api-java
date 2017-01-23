@@ -28,6 +28,8 @@ class IngestRecipeSpec extends Specification {
                 "generate_animated_thumb": true,
                 "generate_sprite": true,
                 "use_watermark": true,
+                "notify_by_email": true,
+                "notify_by_pingback": true,
                 "send_to_youtube": true,
                 "encoding_presets": [
                   {
@@ -89,6 +91,8 @@ class IngestRecipeSpec extends Specification {
             generateSprite
             useWatermark
             sendToYoutube
+            notifyByEmail
+            notifyByPingback
             encodingPresets.size() == 2
             encodingPresetsIds == [4, 5] as Set
             createdAt.isEqual(ZonedDateTime.parse("2016-10-26T11:00:55.000Z"))

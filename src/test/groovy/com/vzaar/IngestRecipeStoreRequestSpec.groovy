@@ -37,7 +37,6 @@ class IngestRecipeStoreRequestSpec extends Specification {
         result.get("use_watermark") == true
     }
 
-
     def "I can populate the request with an entity"() {
         given:
         String payload = '''

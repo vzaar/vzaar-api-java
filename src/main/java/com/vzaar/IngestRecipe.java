@@ -22,6 +22,8 @@ public class IngestRecipe {
     private boolean generateSprite;
     private boolean useWatermark;
     private boolean sendToYoutube;
+    private boolean notifyByEmail;
+    private boolean notifyByPingback;
     private List<EncodingPreset> encodingPresets;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
@@ -76,6 +78,14 @@ public class IngestRecipe {
 
     public boolean isSendToYoutube() {
         return sendToYoutube;
+    }
+
+    public boolean isNotifyByEmail() {
+        return notifyByEmail;
+    }
+
+    public boolean isNotifyByPingback() {
+        return notifyByPingback;
     }
 
     public List<EncodingPreset> getEncodingPresets() {

@@ -4,12 +4,12 @@ apply plugin: 'jacoco'
 
 ext {
     limits = [
-            'instruction': 40,
-            'branch'     : 40,
-            'line'       : 40,
-            'complexity' : 40,
-            'method'     : 40,
-            'class'      : 40
+            'instruction': 50,
+            'branch'     : 55,
+            'line'       : 55,
+            'complexity' : 65,
+            'method'     : 65,
+            'class'      : 75
     ]
 }
 
@@ -66,6 +66,10 @@ jacocoTestReport {
             throw new GradleException("Code coverage failed")
         } else{
             logger.quiet("Passed Code Coverage Checks")
+            metrics.each {
+                def limit = limits[it.key]
+                logger.quiet("- ${it.key} coverage rate is: ${it.value}%, minimum is ${limit}%")
+            }
         }
     }
 }

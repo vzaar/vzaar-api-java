@@ -3,6 +3,9 @@ package com.vzaar;
 import com.vzaar.client.RestClient;
 import com.vzaar.client.RestClientConfiguration;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 public final class Vzaar {
     private final RestClient client;
 
@@ -12,15 +15,15 @@ public final class Vzaar {
 
     public static Vzaar make(String clientId, String authToken) {
         return new Vzaar(new RestClientConfiguration()
-                .setClientId(clientId)
-                .setAuthToken(authToken));
+                .withClientId(clientId)
+                .withAuthToken(authToken));
     }
 
     public static Vzaar make(String endpoint, String clientId, String authToken) {
         return new Vzaar(new RestClientConfiguration()
                 .setEndpoint(endpoint)
-                .setClientId(clientId)
-                .setAuthToken(authToken));
+                .withClientId(clientId)
+                .withAuthToken(authToken));
     }
 
     public static Vzaar make(RestClientConfiguration configuration) {
@@ -30,6 +33,7 @@ public final class Vzaar {
     public ApiVersioning getApiVersioning() {
         return new ApiVersioning(client.getLastResponseHeaders());
     }
+
     public RateLimits getRateLimits() {
         return new RateLimits(client.getLastResponseHeaders());
     }
@@ -40,6 +44,10 @@ public final class Vzaar {
 
     public Video video(int videoId) {
         return client.resource("videos", Video.class).lookup(videoId);
+    }
+
+    public Video createVideo(CreateVideoRequest request) {
+        return client.resource("videos", Video.class).create(request);
     }
 
     public Page<Category> categories(CategoryPageRequest request) {
@@ -80,5 +88,16 @@ public final class Vzaar {
 
     public EncodingPreset encodingPreset(int encodingPresetId) {
         return client.resource("encoding_presets", EncodingPreset.class).lookup(encodingPresetId);
+    }
+
+    public UploadRequest signature(UploadType type, CreateSignatureRequest request) {
+        return new UploadRequest()
+                .withType(type)
+                .withCreateSignatureRequest(request)
+                .withUploadSignature(client.resource("signature", UploadSignature.class).action(type.name()).create(request));
+    }
+
+    public void s3UploadSingle(UploadRequest request, File file) throws Exception {
+        client.uploadVideo(new FileInputStream(file), request);
     }
 }

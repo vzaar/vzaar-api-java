@@ -21,6 +21,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.6'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6'
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
+    compile 'org.apache.httpcomponents:httpmime:4.5.2'
+    compile 'com.amazonaws:aws-java-sdk-s3:1.11.80'
 
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-3'
 
@@ -52,6 +54,11 @@ task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
     outputs.upToDateWhen { false }
+
+    jacoco {
+        append = true
+        destinationFile = file("$buildDir/jacoco/test.exec")
+    }
 }
 
 check.dependsOn integrationTest
