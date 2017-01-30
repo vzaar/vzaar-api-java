@@ -55,6 +55,11 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     outputs.upToDateWhen { false }
 
+    systemProperties = [
+            vzaarClientId: System.getProperty('vzaarClientId'),
+            vzaarAuthToken: System.getProperty('vzaarAuthToken'),
+    ]
+
     jacoco {
         append = true
         destinationFile = file("$buildDir/jacoco/test.exec")

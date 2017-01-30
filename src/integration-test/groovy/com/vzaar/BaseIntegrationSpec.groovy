@@ -8,7 +8,7 @@ public class BaseIntegrationSpec extends Specification {
     def setup() {
         ObjectMapperFactory.setFailOnUnknownProperties(true)
         vzaar = Vzaar.make(
-                System.getenv("vzaarClientId"),
-                System.getenv("vzaarAuthToken"))
+                System.getProperty("vzaarClientId") ?: System.getenv("vzaarClientId"),
+                System.getProperty("vzaarAuthToken") ?: System.getenv("vzaarAuthToken"))
     }
 }

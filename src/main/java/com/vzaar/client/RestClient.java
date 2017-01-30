@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vzaar.UploadRequest;
 import com.vzaar.UploadSignature;
+import com.vzaar.UploadType;
 import com.vzaar.VzaarErrorList;
 import com.vzaar.VzaarException;
 import com.vzaar.VzaarServerException;
@@ -52,6 +53,10 @@ public class RestClient {
         this.httpClient = makeHttpClient(configuration);
     }
 
+    public RestClientConfiguration getConfiguration() {
+        return configuration;
+    }
+
     public Map<String, String> getLastResponseHeaders() {
         return responseHeadersReference.get();
     }
@@ -60,18 +65,18 @@ public class RestClient {
         return new Resource<>(this, type).resource(resource);
     }
 
-    public String uploadVideo(InputStream in, UploadRequest uploadRequest) throws Exception {
-        int bufferSize = 131072; //128Kb
+    public String s3(InputStream in, UploadRequest uploadRequest, int part) throws IOException {
         UploadSignature signature = uploadRequest.getUploadSignature();
         HttpPost request = new HttpPost(signature.getUploadHostname());
-        String fileName = uploadRequest.getCreateSignatureRequest().getFilename(); // + "." + part;
-        long contentLength = uploadRequest.getCreateSignatureRequest().getFilesize();
-        ContentBody body = new FileStreamingBody(in, fileName, contentLength, bufferSize);
+        String fileSuffix = uploadRequest.getType() == UploadType.multipart ? "." + part : "";
+        String fileName = uploadRequest.getCreateSignatureRequest().getFilename();
+        ContentBody body = new FileStreamingBody(in, fileName, uploadRequest.getType() == UploadType.multipart
+                ? uploadRequest.getUploadSignature().getPartSizeInBytes()
+                : uploadRequest.getCreateSignatureRequest().getFilesize());
 
         request.addHeader("User-agent", configuration.getUserAgent());
         request.addHeader("x-amz-acl", signature.getAcl());
         request.addHeader("Enclosure-Type", "multipart/form-data");
-
         request.setEntity(MultipartEntityBuilder.create()
                 .addTextBody("AWSAccessKeyId", signature.getAccessKeyId())
                 .addTextBody("Signature", signature.getSignature())
@@ -79,10 +84,8 @@ public class RestClient {
                 .addTextBody("bucket", signature.getBucket())
                 .addTextBody("policy", signature.getPolicy())
                 .addTextBody("success_action_status", signature.getSuccessActionStatus())
-//                .addTextBody("chunks", String.valueOf(signature.getParts()))
-//                .addTextBody("chunk", String.valueOf(part))
                 .addTextBody("x-amz-meta-uploader", uploadRequest.getCreateSignatureRequest().getUploader())
-                .addTextBody("key", signature.getKey().replace("${filename}", fileName))
+                .addTextBody("key", signature.getKey() + fileSuffix)
                 .addPart("file", body)
                 .build());
 
@@ -90,7 +93,6 @@ public class RestClient {
         EntityUtils.consume(response.getEntity());
         return signature.getGuid();
     }
-
 
     String getEndpoint() {
         return configuration.getEndpoint();

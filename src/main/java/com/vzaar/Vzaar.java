@@ -3,8 +3,7 @@ package com.vzaar;
 import com.vzaar.client.RestClient;
 import com.vzaar.client.RestClientConfiguration;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 
 public final class Vzaar {
     private final RestClient client;
@@ -21,7 +20,7 @@ public final class Vzaar {
 
     public static Vzaar make(String endpoint, String clientId, String authToken) {
         return new Vzaar(new RestClientConfiguration()
-                .setEndpoint(endpoint)
+                .withEndpoint(endpoint)
                 .withClientId(clientId)
                 .withAuthToken(authToken));
     }
@@ -46,8 +45,26 @@ public final class Vzaar {
         return client.resource("videos", Video.class).lookup(videoId);
     }
 
-    public Video createVideo(CreateVideoRequest request) {
-        return client.resource("videos", Video.class).create(request);
+    public Video upload(VideoUploadRequest request) throws IOException {
+        UploadService service = getUploadService();
+
+        RestClientConfiguration configuration = client.getConfiguration();
+        UploadType type = request.getFile().length() > configuration.getUseMultipartWhenFileSizeOver()
+                ? UploadType.multipart
+                : UploadType.single;
+
+        UploadRequest uploadRequest = service.signature(type, new CreateSignatureRequest()
+                .withFile(request.getFile())
+                .withUploader(request.getUploader())
+                .withDesiredPartSizeInMb(type == UploadType.multipart ? configuration.getDefaultDesiredChunkSizeInMb() : null));
+
+        service.upload(uploadRequest, request.getFile());
+
+        return service.createVideo(new CreateVideoRequest()
+                .withGuid(uploadRequest.getUploadSignature().getGuid())
+                .withTitle(request.getTitle())
+                .withDescription(request.getDescription())
+                .withIngestRecipeId(request.getIngestRecipeId()));
     }
 
     public Page<Category> categories(CategoryPageRequest request) {
@@ -90,14 +107,7 @@ public final class Vzaar {
         return client.resource("encoding_presets", EncodingPreset.class).lookup(encodingPresetId);
     }
 
-    public UploadRequest signature(UploadType type, CreateSignatureRequest request) {
-        return new UploadRequest()
-                .withType(type)
-                .withCreateSignatureRequest(request)
-                .withUploadSignature(client.resource("signature", UploadSignature.class).action(type.name()).create(request));
-    }
-
-    public void s3UploadSingle(UploadRequest request, File file) throws Exception {
-        client.uploadVideo(new FileInputStream(file), request);
+    public UploadService getUploadService() {
+        return new UploadService(client);
     }
 }

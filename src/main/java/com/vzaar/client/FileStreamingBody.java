@@ -2,18 +2,25 @@ package com.vzaar.client;
 
 import org.apache.http.entity.mime.content.InputStreamBody;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Objects;
 
 class FileStreamingBody extends InputStreamBody {
+    private static final int BUFFER_SIZE = 8192;
     private final long contentLength;
-    private final int bufferSize;
+    private final byte[] buffer;
+    private long left;
 
-    FileStreamingBody(InputStream in, String filename, final long contentLength, int bufferSize) {
+    FileStreamingBody(InputStream in, String filename, long contentLength) {
+        this(in, filename, contentLength, BUFFER_SIZE);
+    }
+
+    FileStreamingBody(InputStream in, String filename, long contentLength, int bufferSize) {
         super(in, filename);
         this.contentLength = contentLength;
-        this.bufferSize = bufferSize;
+        this.buffer = new byte[bufferSize];
+        this.left = contentLength;
     }
 
     @Override
@@ -23,17 +30,20 @@ class FileStreamingBody extends InputStreamBody {
 
     @Override
     public void writeTo(OutputStream out) throws java.io.IOException {
-        Objects.requireNonNull(out, "Output stream may not be null");
-
         try {
-            byte[] tmp = new byte[bufferSize];
-            int l;
-            while ((l = this.getInputStream().read(tmp)) != -1) {
-                out.write(tmp, 0, l);
+            int read = read();
+            while (read != -1 && left > 0) {
+                out.write(buffer, 0, read);
+                left -= read;
+                read = read();
             }
             out.flush();
         } finally {
-            this.getInputStream().close();
+            getInputStream().close();
         }
+    }
+
+    private int read() throws IOException {
+        return getInputStream().read(buffer, 0, (int) Math.min(buffer.length, left));
     }
 }

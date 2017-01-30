@@ -30,8 +30,8 @@ public class CreateSignatureRequest {
         return this;
     }
 
-    public CreateSignatureRequest withDesiredPartSizeInMb(int mebibytes) {
-        this.desiredPartSize = String.format("%sMB", mebibytes);
+    public CreateSignatureRequest withDesiredPartSizeInMb(Integer mebibytes) {
+        this.desiredPartSize = mebibytes == null ? null : String.format("%sMB", mebibytes);
         return this;
     }
 
