@@ -7,7 +7,7 @@ public class VideoUploadRequest {
     private String uploader;
     private String title;
     private String description;
-    private int ingestRecipeId;
+    private Integer ingestRecipeId;
 
     public File getFile() {
         return file;
@@ -45,11 +45,11 @@ public class VideoUploadRequest {
         return this;
     }
 
-    public int getIngestRecipeId() {
+    public Integer getIngestRecipeId() {
         return ingestRecipeId;
     }
 
-    public VideoUploadRequest withIngestRecipeId(int ingestRecipeId) {
+    public VideoUploadRequest withIngestRecipeId(Integer ingestRecipeId) {
         this.ingestRecipeId = ingestRecipeId;
         return this;
     }

@@ -1,10 +1,12 @@
 package com.vzaar;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vzaar.client.ResourcePath;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
+@ResourcePath(path = "videos")
 public class Video {
     private int id;
     private String title;
@@ -21,6 +23,7 @@ public class Video {
     private VideoState state;
     private String thumbnailUrl;
     private String embedCode;
+    private List<Category> categories;
     private List<Rendition> renditions;
     private List<LegacyRendition> legacyRenditions;
 
@@ -86,5 +89,9 @@ public class Video {
 
     public List<LegacyRendition> getLegacyRenditions() {
         return legacyRenditions;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
     }
 }

@@ -41,6 +41,10 @@ class PageSpec extends Specification {
         entity.data.size() == 2
         entity.data[0].id == 1
         entity.data[1].id == 2
+        entity.totalCount == 4
+        entity.hasNext()
+        entity.hasLast()
+        !entity.hasPrevious()
         with(entity.meta) {
             totalCount == 4
             firstLink == 'http://api.vzaar.com/api/v2/videos'

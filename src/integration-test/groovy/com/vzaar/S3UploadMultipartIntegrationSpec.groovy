@@ -4,17 +4,16 @@ public class S3UploadMultipartIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can upload a video in multiple part"() {
         given:
-        File file = new File(getClass().classLoader.getResource("videos/video.mp4").getFile());
-        UploadRequest uploadRequest = vzaar.uploadService.signature(UploadType.multipart, new CreateSignatureRequest()
-                .withFile(file)
+        UploadRequest uploadRequest = vzaar.customUploader.signature(UploadType.multipart, new CreateSignatureRequest()
+                .withFile(mediumVideo)
                 .withUploader("java-integration-test")
                 .withDesiredPartSizeInMb(5)
-                .withFilesize(file.size()))
+                .withFilesize(mediumVideo.size()))
 
 
         when:
-        vzaar.uploadService.upload(uploadRequest, file);
-        Video entity = vzaar.uploadService.createVideo(new CreateVideoRequest()
+        vzaar.customUploader.upload(uploadRequest, mediumVideo);
+        Video entity = vzaar.customUploader.createVideo(new CreateVideoRequest()
                 .withGuid(uploadRequest.uploadSignature.guid)
                 .withTitle("Integration tester ${uploadRequest.uploadSignature.guid}")
                 .withDescription("From the java sdk integration tests"))
@@ -26,6 +25,5 @@ public class S3UploadMultipartIntegrationSpec extends BaseIntegrationSpec {
         then:
         entity.title == "Integration tester ${uploadRequest.uploadSignature.guid}"
         entity.description == "From the java sdk integration tests"
-
     }
 }

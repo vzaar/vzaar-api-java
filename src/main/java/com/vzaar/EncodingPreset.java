@@ -1,7 +1,10 @@
 package com.vzaar;
 
+import com.vzaar.client.ResourcePath;
+
 import java.time.ZonedDateTime;
 
+@ResourcePath(path = "encoding_presets")
 public class EncodingPreset {
     private int id;
     private String name;

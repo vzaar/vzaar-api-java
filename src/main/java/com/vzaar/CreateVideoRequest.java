@@ -11,7 +11,7 @@ public class CreateVideoRequest {
         return this;
     }
 
-    public CreateVideoRequest withIngestRecipeId(int ingestRecipeId) {
+    public CreateVideoRequest withIngestRecipeId(Integer ingestRecipeId) {
         this.ingestRecipeId = ingestRecipeId;
         return this;
     }

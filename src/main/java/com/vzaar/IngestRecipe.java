@@ -1,12 +1,14 @@
 package com.vzaar;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vzaar.client.ResourcePath;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@ResourcePath(path = "ingest_recipes")
 public class IngestRecipe {
     private int id;
     private String name;

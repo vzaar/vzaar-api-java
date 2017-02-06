@@ -1,5 +1,8 @@
 package com.vzaar;
 
+import com.vzaar.client.ResourcePath;
+
+@ResourcePath(path = "signature")
 public class UploadSignature {
     private String accessKeyId;
     private String key;

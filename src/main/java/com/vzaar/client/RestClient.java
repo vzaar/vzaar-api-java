@@ -2,6 +2,7 @@ package com.vzaar.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vzaar.RateLimits;
 import com.vzaar.UploadRequest;
 import com.vzaar.UploadSignature;
 import com.vzaar.UploadType;
@@ -31,6 +32,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,8 +63,8 @@ public class RestClient {
         return responseHeadersReference.get();
     }
 
-    public <T> Resource<T> resource(String resource, Class<T> type) {
-        return new Resource<>(this, type).resource(resource);
+    public <T> Resource<T> resource(Class<T> type) {
+        return new Resource<>(this, type);
     }
 
     public String s3(InputStream in, UploadRequest uploadRequest, int part) throws IOException {
@@ -96,6 +98,14 @@ public class RestClient {
 
     String getEndpoint() {
         return configuration.getEndpoint();
+    }
+
+    <T> Resource<T> get(Resource<T> resource, String url) {
+        try {
+            return execute(resource, new HttpGet(new URI(url)));
+        } catch (IOException | URISyntaxException e) {
+            throw new VzaarException(e);
+        }
     }
 
     <T> Resource<T> get(Resource<T> resource) {
@@ -139,6 +149,8 @@ public class RestClient {
     }
 
     private <T> Resource<T> execute(Resource<T> resource, HttpUriRequest request) throws IOException {
+        blockTillRateLimitReset();
+
         request.addHeader(HEADER_CLIENT_ID, configuration.getClientId());
         request.addHeader(HEADER_AUTH_TOKEN, configuration.getAuthToken());
         request.addHeader(HEADER_USER_AGENT, configuration.getUserAgent());
@@ -148,8 +160,17 @@ public class RestClient {
                 throwError(response);
             }
 
-            responseHeadersReference.set(buildHeaderMap(response));
+            if (response.containsHeader(RateLimits.HEADER_RATELIMIT_LIMIT)) {
+                responseHeadersReference.set(buildHeaderMap(response));
+            }
             return resource.body(readEntity(response));
+        }
+    }
+
+    private void blockTillRateLimitReset() {
+        if (configuration.isBlockTillRateLimitReset() && getLastResponseHeaders() != null) {
+            RateLimits limits = new RateLimits(getLastResponseHeaders());
+            limits.blockTillRateLimitReset();
         }
     }
 

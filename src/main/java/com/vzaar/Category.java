@@ -1,7 +1,10 @@
 package com.vzaar;
 
+import com.vzaar.client.ResourcePath;
+
 import java.time.ZonedDateTime;
 
+@ResourcePath(path = "categories")
 public class Category {
     private int id;
     private int accountId;

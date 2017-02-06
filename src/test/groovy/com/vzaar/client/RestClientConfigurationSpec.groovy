@@ -17,6 +17,7 @@ class RestClientConfigurationSpec extends Specification {
         config.useMultipartWhenFileSizeInMbOver == 1024
         config.useMultipartWhenFileSizeOver == 1073741824l
         config.userAgent == 'vzaar-sdk-java 2.0.0'
+        !config.blockTillRateLimitReset
     }
 
     def "I can set configuration values"() {
@@ -29,6 +30,7 @@ class RestClientConfigurationSpec extends Specification {
             .withMaxConnectionsPerRoute(22)
             .withUseMultipartWhenFileSizeInMbOver(5)
             .withUserAgent("ninelives 9.0.0")
+            .withBlockTillRateLimitReset(true)
 
         then:
         config.authToken == 'secret'
@@ -39,6 +41,7 @@ class RestClientConfigurationSpec extends Specification {
         config.useMultipartWhenFileSizeInMbOver == 5
         config.useMultipartWhenFileSizeOver == 5242880l
         config.userAgent == 'ninelives 9.0.0'
+        config.blockTillRateLimitReset
     }
 
     def "The lower boundary condition for auto selecting multipart are checked"() {

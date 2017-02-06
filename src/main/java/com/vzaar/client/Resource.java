@@ -13,21 +13,19 @@ import java.util.Objects;
 public class Resource<T> {
     private final RestClient client;
     private final Class<T> type;
-    private String resource;
+    private String path;
     private Integer id;
     private String action;
     private Object params;
-    private Object payload;
     private byte[] body;
 
-    public Resource(RestClient client, Class<T> type) {
+    Resource(RestClient client, Class<T> type) {
         this.client = client;
         this.type = type;
-    }
-
-    public Resource<T> resource(String resource) {
-        this.resource = resource;
-        return this;
+        ResourcePath resourcePath = Objects.requireNonNull(
+                type.getAnnotation(ResourcePath.class),
+                "Resource missing @ResourcePath annotation");
+        this.path = resourcePath.path();
     }
 
     public Resource<T> id(Integer id) {
@@ -43,52 +41,37 @@ public class Resource<T> {
     public Page<T> page(Object params) {
         this.params = params;
         client.get(this);
-        try {
-            return client.getObjectMapper().readValue(body, wrapper(Page.class));
-        } catch (IOException e) {
-            throw new VzaarException(e);
-        }
+        return getPage();
+    }
+
+    public Page<T> pageWithUrl(String url) {
+        client.get(this, url);
+        return getPage();
+    }
+
+    public Resource<T> path(String path) {
+        this.path = path;
+        return this;
     }
 
     public T lookup(int id) {
         this.id = id;
         client.get(this);
-        try {
-            Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
-            return data.getData();
-        } catch (IOException e) {
-            throw new VzaarException(e);
-        }
+        return getData();
     }
 
     public T create(Object request) {
-        this.payload = request;
         client.post(this, request);
-        try {
-            Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
-            return data.getData();
-        } catch (IOException e) {
-            throw new VzaarException(e);
-        }
+        return getData();
     }
 
     public T update(Object request) {
-        this.payload = request;
         client.patch(this, request);
-        try {
-            Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
-            return data.getData();
-        } catch (IOException e) {
-            throw new VzaarException(e);
-        }
+        return getData();
     }
 
     public void delete() {
         client.delete(this);
-    }
-
-    private JavaType wrapper(Class wrapperType) {
-        return client.getObjectMapper().getTypeFactory().constructParametricType(wrapperType, type);
     }
 
     Resource<T> body(byte[] body) {
@@ -99,7 +82,7 @@ public class Resource<T> {
     URI getUri() throws URISyntaxException {
         StringBuilder uri = new StringBuilder(client.getEndpoint())
                 .append("/")
-                .append(Objects.requireNonNull(resource, "resource is required"));
+                .append(path);
 
         if (id != null) {
             uri.append("/").append(id);
@@ -114,5 +97,28 @@ public class Resource<T> {
         }
 
         return new URI(uri.toString());
+    }
+
+    private JavaType wrapper(Class wrapperType) {
+        return client.getObjectMapper().getTypeFactory().constructParametricType(wrapperType, type);
+    }
+
+    private T getData() {
+        try {
+            Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
+            return data.getData();
+        } catch (IOException e) {
+            throw new VzaarException(e);
+        }
+    }
+
+    private Page<T> getPage() {
+        try {
+            Page<T> page = client.getObjectMapper().readValue(body, wrapper(Page.class));
+            page.setResource(this);
+            return page;
+        } catch (IOException e) {
+            throw new VzaarException(e);
+        }
     }
 }

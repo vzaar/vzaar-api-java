@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 
-public class UploadService {
+public class CustomUploader {
     private final RestClient client;
 
-    public UploadService(RestClient client) {
+    public CustomUploader(RestClient client) {
         this.client = client;
     }
 
@@ -19,7 +19,7 @@ public class UploadService {
         return new UploadRequest()
                 .withType(type)
                 .withCreateSignatureRequest(request)
-                .withUploadSignature(client.resource("signature", UploadSignature.class).action(type.name()).create(request));
+                .withUploadSignature(client.resource(UploadSignature.class).action(type.name()).create(request));
     }
 
 
@@ -44,6 +44,6 @@ public class UploadService {
     }
 
     public Video createVideo(CreateVideoRequest request) {
-        return client.resource("videos", Video.class).create(request);
+        return client.resource(Video.class).create(request);
     }
 }

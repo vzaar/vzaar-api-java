@@ -8,6 +8,7 @@ public class RestClientConfiguration {
     private int maxConnectionsPerRoute = 20;
     private int useMultipartWhenFileSizeInMbOver = 1024;
     private int defaultDesiredChunkSizeInMb = 128;
+    private boolean blockTillRateLimitReset;
 
     public String getEndpoint() {
         return endpoint;
@@ -77,6 +78,15 @@ public class RestClientConfiguration {
 
     public RestClientConfiguration withDefaultDesiredChunkSizeInMb(int defaultDesiredChunkSizeInMb) {
         this.defaultDesiredChunkSizeInMb = defaultDesiredChunkSizeInMb;
+        return this;
+    }
+
+    public boolean isBlockTillRateLimitReset() {
+        return blockTillRateLimitReset;
+    }
+
+    public RestClientConfiguration withBlockTillRateLimitReset(boolean blockTillRateLimitReset) {
+        this.blockTillRateLimitReset = blockTillRateLimitReset;
         return this;
     }
 }
