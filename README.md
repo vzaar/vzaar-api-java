@@ -4,6 +4,8 @@
 [![Code Quality](https://api.codacy.com/project/badge/grade/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
 [![Coverage](https://api.codacy.com/project/badge/coverage/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
 
+Vzaar Java SDK for Java 8+
+
 ## Getting Started
 
 The vzaar API requires you to have a client ID and authentication token. 
@@ -53,18 +55,19 @@ all the items on a given page and subsequent pages as a single list or
 stream.
 
 ```
-    // This will collate all videos irrelevant of the number of pages 
+    // Collate all videos irrelevant of the number of pages 
     List<Video> videos = Pages.list(vzaar.videos(new VideoPageRequest());
     
-    // This will produce an iterator that will return all the videos
-    // irrelevant of the number of pages. Note that calls the pages
-    // lazily so may be preferable if memory is an issue
+    // An iterator that will return all the videos irrelevant
+    // of the number of pages. Note that this calls subsequent pages
+    // lazily so may be preferable to Pages.list if memory is an issue or 
+    // there are early exit conditions from a loop
     Iterator<Video> videos = Pages.iterator(vzaar.videos(new VideoPageRequest());
     while(videos.hasNext()) {
         Video video = videos.next();
     }
     
-    // This produces an iterable wrapper around the iterator
+    // An iterable wrapper around the iterator
     for (Video video : Pages.iterable(vzaar.videos(new VideoPageRequest())) {
     }
 ```
