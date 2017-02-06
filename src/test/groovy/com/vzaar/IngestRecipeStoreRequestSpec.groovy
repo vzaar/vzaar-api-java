@@ -21,6 +21,8 @@ class IngestRecipeStoreRequestSpec extends Specification {
                 .withName("new_video")
                 .withSendToYoutube(true)
                 .withUseWatermark(true)
+                .withNotifyByEmail(true)
+                .withNotifyByPingback(true)
 
         when:
         Map<String, Object> result = mapper.readValue(mapper.writeValueAsString(request), Map.class)
@@ -35,6 +37,8 @@ class IngestRecipeStoreRequestSpec extends Specification {
         result.get("name") == "new_video"
         result.get("send_to_youtube") == true
         result.get("use_watermark") == true
+        result.get("notify_by_email") == true
+        result.get("notify_by_pingback") == true
     }
 
     def "I can populate the request with an entity"() {
@@ -55,6 +59,8 @@ class IngestRecipeStoreRequestSpec extends Specification {
                 "generate_sprite": true,
                 "use_watermark": true,
                 "send_to_youtube": true,
+                "notify_by_email": true,
+                "notify_by_pingback": true,
                 "encoding_presets": [
                   {
                     "id": 4,
@@ -115,6 +121,7 @@ class IngestRecipeStoreRequestSpec extends Specification {
         result.get("name") == "Ingest recipe 1"
         result.get("send_to_youtube") == true
         result.get("use_watermark") == true
-
+        result.get("notify_by_email") == true
+        result.get("notify_by_pingback") == true
     }
 }

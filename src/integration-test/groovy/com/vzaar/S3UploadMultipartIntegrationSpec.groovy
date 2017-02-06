@@ -13,7 +13,7 @@ public class S3UploadMultipartIntegrationSpec extends BaseIntegrationSpec {
 
         when:
         vzaar.customUploader.upload(uploadRequest, mediumVideo);
-        Video entity = vzaar.customUploader.createVideo(new CreateVideoRequest()
+        Video entity = vzaar.customUploader.createVideo(new VideoCreateRequest()
                 .withGuid(uploadRequest.uploadSignature.guid)
                 .withTitle("Integration tester ${uploadRequest.uploadSignature.guid}")
                 .withDescription("From the java sdk integration tests"))

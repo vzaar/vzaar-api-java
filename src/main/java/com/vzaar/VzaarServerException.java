@@ -14,14 +14,26 @@ public class VzaarServerException extends VzaarException {
         this.errors = errors.getErrors();
     }
 
+    /**
+     * Get the HTTP status code
+     * @return the status code
+     */
     public int getStatusCode() {
         return statusCode;
     }
 
+    /**
+     * Get the HTTP status message
+     * @return the status message
+     */
     public String getStatusMessage() {
         return statusMessage;
     }
 
+    /**
+     * Get the errors returned by the vzaar server
+     * @return the list of errors
+     */
     public List<VzaarError> getErrors() {
         return errors;
     }

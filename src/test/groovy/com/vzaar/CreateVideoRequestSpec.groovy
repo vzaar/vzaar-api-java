@@ -15,7 +15,7 @@ class CreateVideoRequestSpec extends Specification {
 
     def "I can make the request to the expected JSON payload"() {
         given:
-        CreateLinkUploadRequest request = new CreateLinkUploadRequest()
+        VideoLinkUploadRequest request = new VideoLinkUploadRequest()
                 .withUrl("http://mydomain.com/video.mp4")
                 .withIngestRecipeId(1234)
                 .withTitle("my video")

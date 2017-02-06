@@ -5,11 +5,21 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Utility class to collect result from a page and subsequent pages
+ */
 public final class Pages {
     private Pages() {
 
     }
 
+    /**
+     * Collect the results from the provided page and all subsequent
+     * pages into a list
+     * @param firstPage the first page inclusively to collect results from
+     * @param <T> the result type
+     * @return a list containing all results for this and subsequent pages
+     */
     public static <T> List<T> list(Page<T> firstPage) {
         if (firstPage.getTotalCount() == 0) {
             return Collections.emptyList();
@@ -27,6 +37,14 @@ public final class Pages {
         return all;
     }
 
+    /**
+     * Returns an iterator that provides all the results for the provided page
+     * and subsequent pages. As opposed to the list method this calls
+     * pages lazily when the prior page results are exhausted
+     * @param page the first page inclusively to collect results from
+     * @param <T> the result type
+     * @return an iterator
+     */
     public static <T> Iterator<T> iterator(Page<T> page) {
         if (page.getTotalCount() == 0) {
             return Collections.emptyIterator();
@@ -36,6 +54,14 @@ public final class Pages {
     }
 
 
+    /**
+     * Returns an iterable instance that provides all the results for the provided page
+     * and subsequent pages. As opposed to the list method this calls
+     * pages lazily when the prior page results are exhausted
+     * @param page the first page inclusively to collect results from
+     * @param <T> the result type
+     * @return an iterator
+     */
     public static <T> Iterable<T> iterable(Page<T> page) {
         return () -> Pages.iterator(page);
     }

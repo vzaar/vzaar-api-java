@@ -11,7 +11,7 @@ public class S3UploadSinglepartIntegrationSpec extends BaseIntegrationSpec {
 
         when:
         vzaar.customUploader.upload(uploadRequest, smallVideo);
-        Video entity = vzaar.customUploader.createVideo(new CreateVideoRequest()
+        Video entity = vzaar.customUploader.createVideo(new VideoCreateRequest()
                 .withGuid(uploadRequest.uploadSignature.guid)
                 .withTitle("Integration test ${uploadRequest.uploadSignature.guid}")
                 .withDescription("From the java sdk integration tests"))

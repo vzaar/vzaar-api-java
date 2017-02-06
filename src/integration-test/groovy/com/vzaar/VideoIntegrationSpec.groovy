@@ -203,7 +203,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can upload a video via a link"() {
         when:
-        Video video = vzaar.upload(new CreateLinkUploadRequest()
+        Video video = vzaar.upload(new VideoLinkUploadRequest()
                 .withUrl("https://github.com/nine-lives/vzaar-sdk-java/raw/master/src/integration-test/resources/videos/small.mp4")
                 .withUploader("integration-test")
                 .withDescription("Link video description")

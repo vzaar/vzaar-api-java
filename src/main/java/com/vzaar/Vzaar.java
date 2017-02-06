@@ -61,14 +61,14 @@ public final class Vzaar {
 
         service.upload(uploadRequest, request.getFile());
 
-        return service.createVideo(new CreateVideoRequest()
+        return service.createVideo(new VideoCreateRequest()
                 .withGuid(uploadRequest.getUploadSignature().getGuid())
                 .withTitle(request.getTitle())
                 .withDescription(request.getDescription())
                 .withIngestRecipeId(request.getIngestRecipeId()));
     }
 
-    public Video upload(CreateLinkUploadRequest request) {
+    public Video upload(VideoLinkUploadRequest request) {
         return client.resource(Video.class).path("link_uploads").create(request);
     }
 
