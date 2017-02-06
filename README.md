@@ -109,7 +109,7 @@ You can also upload your video from a URL.
     Video video = vzaar.upload(new CreateLinkUploadRequest()
         .withTitle("My video title")
         .withUploader("Jack Smith")
-       .withUrl("https://www.example.com/my-video.com"));
+        .withUrl("https://www.example.com/my-video.com"));
 ```
 
 If you need more control over your uploads you can call the `CustomUploader`
