@@ -29,7 +29,7 @@ class FileStreamingBody extends InputStreamBody {
     }
 
     @Override
-    public void writeTo(OutputStream out) throws java.io.IOException {
+    public void writeTo(OutputStream out) throws IOException {
         try {
             int read = read();
             while (read != -1 && left > 0) {
