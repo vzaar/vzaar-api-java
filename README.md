@@ -145,9 +145,8 @@ which will give you finer control over your uploads.
 
 ## Custom Configuration
 
-You can also use the `RestClientConfiguration` to configure the SDK. Apart
-from the the client id and auth token all the other values have defaults
-show below.
+You can also use `RestClientConfiguration` to configure the SDK. Apart
+from the the client id and auth token all the other values have defaults.
 
 ```
     Vzaar vzaar = Vzaar.make(new RestClientConfiguration()
