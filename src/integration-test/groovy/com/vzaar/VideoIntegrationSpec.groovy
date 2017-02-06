@@ -4,6 +4,16 @@ import spock.lang.Unroll
 
 public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
+    def setup() {
+        // Wait for list stability
+        while (vzaar.videos(new VideoPageRequest().withState(VideoState.processing)).totalCount > 0) {
+            try {
+                sleep(10000)
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
     def "I can get videos"() {
         when:
         Page<Video> page = vzaar.videos(new VideoPageRequest())
