@@ -6,7 +6,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def setup() {
         // Wait for list stability
-        while (vzaar.videos(new VideoPageRequest().withState(VideoState.processing)).totalCount > 0) {
+        while (vzaar.videos().list().withState(VideoState.processing).results().totalCount > 0) {
             try {
                 sleep(10000)
             } catch (Exception ignore) {
@@ -16,7 +16,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can get videos"() {
         when:
-        Page<Video> page = vzaar.videos(new VideoPageRequest())
+        Page<Video> page = vzaar.videos().list().results()
 
         then:
         page.totalCount >= 3
@@ -30,11 +30,11 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can paginate videos"() {
         given:
-        List<Video> videos = Pages.list(vzaar.videos(new VideoPageRequest()))
-        VideoPageRequest request = new VideoPageRequest().withResultsPerPage(1)
+        List<Video> videos = Pages.list(vzaar.videos().list().results())
+        VideoPageRequest request = vzaar.videos().list().withResultsPerPage(1)
 
         when:
-        Page<Video> page1 = vzaar.videos(request)
+        Page<Video> page1 = request.results()
 
         then:
         page1.totalCount >= 3
@@ -45,7 +45,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         videos[0].id == page1.data[0].id
 
         when:
-        Page<Video> page2 = vzaar.videos(request.withPage(2))
+        Page<Video> page2 = request.withPage(2).results()
 
         then:
         page2.totalCount >= 3
@@ -56,7 +56,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         videos[1].id == page2.data[0].id
 
         when:
-        Page<Video> page3 = vzaar.videos(request.withPage(3))
+        Page<Video> page3 = request.withPage(3).results()
 
         then:
         page3.totalCount >= 3
@@ -70,17 +70,20 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
     @Unroll("I can sort videos by #attribute")
     def "I can sort videos by attributes"() {
         given:
-        VideoPageRequest request = new VideoPageRequest().withResultsPerPage(2).withSortByAttribute(attribute).withSortDirection(SortDirection.asc)
+        VideoPageRequest request = vzaar.videos().list()
+                .withResultsPerPage(2)
+                .withSortByAttribute(attribute)
+                .withSortDirection(SortDirection.asc)
 
         when:
-        List<Video> videos = Pages.list(vzaar.videos(request))
+        List<Video> videos = Pages.list(request.results())
 
         then:
         videos.size() > 0
         videos.collect(map) == videos.collect(map).sort()
 
         when:
-        videos = Pages.list(vzaar.videos(request.withSortDirection(SortDirection.desc)))
+        videos = Pages.list(request.withSortDirection(SortDirection.desc).results())
 
         then:
         videos.size() > 0
@@ -96,7 +99,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
     @Unroll("I can search for a video with special characters #search without getting an error")
     def "I can search for a video by title with special characters"() {
         when:
-        Page<Video> page = vzaar.videos(new VideoPageRequest().withEscapedQuery(q))
+        Page<Video> page = vzaar.videos().list().withEscapedQuery(q).results()
 
         then:
         page.totalCount == 0
@@ -117,10 +120,10 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can search for a video by title"() {
         given:
-        Page<Video> allVideosPage = vzaar.videos(new VideoPageRequest())
+        Page<Video> allVideosPage = vzaar.videos().list().results()
 
         when:
-        Page<Video> searchVideosPage = vzaar.videos(new VideoPageRequest().withEscapedQuery(allVideosPage.data[0].title))
+        Page<Video> searchVideosPage = vzaar.videos().list().withEscapedQuery(allVideosPage.data[0].title).results()
 
         then:
         searchVideosPage.totalCount == 1
@@ -131,13 +134,14 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can update a video"() {
         given:
-        List<IngestRecipe> recipes = Pages.list(vzaar.recipes(new IngestRecipePageRequest()))
-        Category catUpload1 = vzaar.categoryCreate(new CategoryCreateRequest().withName("My Cat 8"))
+        List<IngestRecipe> recipes = Pages.list(vzaar.recipes().list().results())
+        Category catUpload1 = vzaar.categories().create().withName("My Cat 8").result()
         List<Category> categories = [
                 catUpload1,
-                vzaar.categoryCreate(new CategoryCreateRequest()
+                vzaar.categories().create()
                         .withName("My Cat 9")
-                        .withParentId(catUpload1.id))
+                        .withParentId(catUpload1.id)
+                        .result()
         ]
 
         when:
@@ -160,17 +164,18 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         while (waitForVideo == null || waitForVideo.state == VideoState.processing) {
             try {
                 sleep(10000)
-                waitForVideo = vzaar.video(video.id)
+                waitForVideo = vzaar.videos().get(video.id)
             } catch (Exception ignore) {
             }
         }
 
-        video = vzaar.videoUpdate(video.id, new VideoUpdateRequest()
+        video = vzaar.videos().update(video.id)
                 .withTitle("Updated Video")
                 .withDescription("Updated video description")
                 .withPrivate(true)
                 .withSeoUrl("http://www.9ls.com/video.mp4")
-                .withCategoryIds([categories[1].id] as Set))
+                .withCategoryIds([categories[1].id] as Set)
+                .result()
 
         then:
         video.title == 'Updated Video'
@@ -187,8 +192,8 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 //        page.data[0].id == video.id
 
         when:
-        Category cat1 = vzaar.category(categories[0].id)
-        Category cat2 = vzaar.category(categories[1].id)
+        Category cat1 = vzaar.categories().get(categories[0].id)
+        Category cat2 = vzaar.categories().get(categories[1].id)
 
         then:
         cat1.treeVideoCount == 1
@@ -197,8 +202,8 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         cat2.nodeVideoCount == 1
 
         cleanup:
-        vzaar.videoDelete(video.id)
-        vzaar.categoryDelete(categories[0].id)
+        vzaar.videos().delete(video.id)
+        vzaar.categories().delete(categories[0].id)
     }
 
     def "I can upload a video via a link"() {

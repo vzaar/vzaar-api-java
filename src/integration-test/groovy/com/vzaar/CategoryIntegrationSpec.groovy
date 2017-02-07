@@ -12,18 +12,18 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
     private static List<Category> categories
 
     def setupSpec() {
-        cat1 = vzaar.categoryCreate(new CategoryCreateRequest().withName("Category 1"))
-        cat2 = vzaar.categoryCreate(new CategoryCreateRequest().withName("Category 2"))
-        cat11 = vzaar.categoryCreate(new CategoryCreateRequest().withName("Category 1 - 1").withParentId(cat1.id))
-        cat12 = vzaar.categoryCreate(new CategoryCreateRequest().withName("Category 1 - 2").withParentId(cat1.id))
-        cat111 = vzaar.categoryCreate(new CategoryCreateRequest().withName("Category 1 - 1 - 1").withParentId(cat11.id))
+        cat1 = vzaar.categories().create().withName("Category 1").result()
+        cat2 = vzaar.categories().create().withName("Category 2").result()
+        cat11 = vzaar.categories().create().withName("Category 1 - 1").withParentId(cat1.id).result()
+        cat12 = vzaar.categories().create().withName("Category 1 - 2").withParentId(cat1.id).result()
+        cat111 = vzaar.categories().create().withName("Category 1 - 1 - 1").withParentId(cat11.id).result()
         categories = [cat1, cat2, cat11, cat12, cat111]
     }
 
     @Unroll("I can see the data from the server is correct #name")
     def "I can see the data from the server is correct"() {
         when:
-        Category cat = vzaar.category(category.id)
+        Category cat = vzaar.categories().get(category.id)
 
         then:
         cat.name == name
@@ -43,7 +43,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can list categories"() {
         when:
-        Page<Category> page = vzaar.categories(new CategoryPageRequest());
+        Page<Category> page = vzaar.categories().list().results();
 
         then:
         page.totalCount == 5
@@ -55,11 +55,11 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can page categories"() {
         given:
-        List<Category> categories = Pages.list(vzaar.categories(new CategoryPageRequest()))
-        CategoryPageRequest request = new CategoryPageRequest().withResultsPerPage(2)
+        List<Category> categories = Pages.list(vzaar.categories().list().results())
+        CategoryPageRequest request = vzaar.categories().list().withResultsPerPage(2)
 
         when:
-        Page<Category> page1 = vzaar.categories(request)
+        Page<Category> page1 = request.results()
 
         then:
         page1.totalCount == 5
@@ -70,7 +70,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
         categories[0].id == page1.data[0].id
 
         when:
-        Page<Category> page2 = vzaar.categories(request.withPage(2))
+        Page<Category> page2 = request.withPage(2).results()
 
         then:
         page2.totalCount == 5
@@ -81,7 +81,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
         categories[2].id == page2.data[0].id
 
         when:
-        Page<Category> page3 = vzaar.categories(request.withPage(3))
+        Page<Category> page3 = request.withPage(3).results()
 
         then:
         page3.totalCount == 5
@@ -94,7 +94,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can restrict categories to 1 level"() {
         when:
-        Page<Category> page = vzaar.categories(new CategoryPageRequest().withLevels(1));
+        Page<Category> page = vzaar.categories().list().withLevels(1).results();
 
         then:
         page.totalCount == 2
@@ -107,7 +107,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can restrict categories to 2 levels"() {
         when:
-        Page<Category> page = vzaar.categories(new CategoryPageRequest().withLevels(2));
+        Page<Category> page = vzaar.categories().list().withLevels(2).results();
 
         then:
         page.totalCount == 4
@@ -120,7 +120,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can query categories by id"() {
         when:
-        Page<Category> page = vzaar.categories(new CategoryPageRequest().withIds([cat11.id, cat2.id]));
+        Page<Category> page = vzaar.categories().list().withIds([cat11.id, cat2.id]).results();
 
         then:
         page.totalCount == 2
@@ -134,17 +134,17 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
     @Unroll("I can sort categories by #attribute")
     def "I can sort categories by attributes"() {
         given:
-        CategoryPageRequest request = new CategoryPageRequest().withResultsPerPage(2).withSortByAttribute(attribute).withSortDirection(SortDirection.asc)
+        CategoryPageRequest request = vzaar.categories().list().withResultsPerPage(2).withSortByAttribute(attribute).withSortDirection(SortDirection.asc)
 
         when:
-        List<Category> categories = Pages.list(vzaar.categories(request))
+        List<Category> categories = Pages.list(request.results())
 
         then:
         categories.size() > 0
         categories.collect(map) == categories.collect(map).sort()
 
         when:
-        categories = Pages.list(vzaar.categories(request.withSortDirection(SortDirection.desc)))
+        categories = Pages.list(request.withSortDirection(SortDirection.desc).results())
 
         then:
         categories.size() > 0
@@ -158,7 +158,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can list subcategories"() {
         when:
-        Page<Category> page = vzaar.categories(cat11.id, new CategoryPageRequest());
+        Page<Category> page = vzaar.categories().subtree(cat11.id).results()
 
         then:
         page.totalCount == 2
@@ -172,11 +172,10 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can page subcategories"() {
         given:
-        List<Category> categories = Pages.list(vzaar.categories(cat1.id, new CategoryPageRequest()))
-        CategoryPageRequest request = new CategoryPageRequest().withResultsPerPage(2)
+        List<Category> categories = Pages.list(vzaar.categories().subtree(cat1.id).results())
 
         when:
-        Page<Category> page1 = vzaar.categories(cat1.id, request)
+        Page<Category> page1 = vzaar.categories().subtree(cat1.id).withResultsPerPage(2).results()
 
         then:
         categories.size() == 4
@@ -201,7 +200,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can restrict subcategories to 1 level"() {
         when:
-        Page<Category> page = vzaar.categories(cat11.id, new CategoryPageRequest().withLevels(1));
+        Page<Category> page = vzaar.categories().subtree(cat11.id).withLevels(1).results()
 
         then:
         page.totalCount == 1
@@ -214,7 +213,7 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can query subcategories by id"() {
         when:
-        Page<Category> page = vzaar.categories(cat11.id, new CategoryPageRequest().withIds([cat11.id, cat2.id]));
+        Page<Category> page = vzaar.categories().subtree(cat11.id).withIds([cat11.id, cat2.id]).results()
 
         then:
         page.totalCount == 1
@@ -227,44 +226,46 @@ class CategoryIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can update a category"() {
         when:
-        Category category = vzaar.categoryCreate(new CategoryCreateRequest().withName("Updatable category"))
+        Category category = vzaar.categories().create().withName("Updatable categories").result()
 
         then:
-        category.name == 'Updatable category'
+        category.name == 'Updatable categories'
         category.depth == 0
         category.parentId == null
 
         when:
-        category = vzaar.categoryUpdate(category.id, new CategoryUpdateRequest()
-                .withName("Moved category")
-                .withParentId(cat12.id))
+        category = vzaar.categories().update(category.id)
+                .withName("Moved categories")
+                .withParentId(cat12.id)
+                .result()
 
         then:
-        category.name == 'Moved category'
+        category.name == 'Moved categories'
         category.depth == 2
         category.parentId == cat12.id
 
         when:
-        category = vzaar.categoryUpdate(category.id, new CategoryUpdateRequest()
-                .withName("Root category")
-                .withMoveToRoot(true))
+        category = vzaar.categories().update(category.id)
+                .withName("Root categories")
+                .withMoveToRoot(true)
+                .result()
 
         then:
-        category.name == 'Root category'
+        category.name == 'Root categories'
         category.depth == 0
         category.parentId == null
 
         cleanup:
-        vzaar.categoryDelete(category.id)
+        vzaar.categories().delete(category.id)
     }
 
     def "I can delete a category"() {
         given:
-        Category category = vzaar.categoryCreate(new CategoryCreateRequest().withName("Deletable category"))
+        Category category = vzaar.categories().create().withName("Deletable categories").result()
 
         when:
-        vzaar.categoryDelete(category.id)
-        vzaar.category(category.id)
+        vzaar.categories().delete(category.id)
+        vzaar.categories().get(category.id)
 
         then:
         VzaarServerException exception = thrown(VzaarServerException)

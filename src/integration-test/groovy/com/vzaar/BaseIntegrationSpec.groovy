@@ -33,42 +33,38 @@ public class BaseIntegrationSpec extends Specification {
     }
 
     def cleanupAll() {
-        for (Video video : Pages.list(vzaar.videos(new VideoPageRequest()))) {
+        for (Video video : Pages.list(vzaar.videos().list().results())) {
             if (!video.title.contains("[DND]") && video.state != VideoState.deleted) {
-                vzaar.videoDelete(video.id)
-            }
-        }
-//        for (Video video : Pages.list(vzaar.videos(new VideoPageRequest().withState(VideoState.failed)))) {
-//            if (!video.title.contains("[DND]")) {
-//                vzaar.videoDelete(video.id)
-//            }
-//        }
-        for (Category category : Pages.list(vzaar.categories(new CategoryPageRequest()))) {
-            if (!category.name.contains("[DND]") && category.parentId == null) {
-                vzaar.categoryDelete(category.id)
+                vzaar.videos().delete(video.id)
             }
         }
 
-        for (IngestRecipe recipe : Pages.list(vzaar.recipes(new IngestRecipePageRequest()))) {
+        for (Category category : Pages.list(vzaar.categories().list().results())) {
+            if (!category.name.contains("[DND]") && category.parentId == null) {
+                vzaar.categories().delete(category.id)
+            }
+        }
+
+        for (IngestRecipe recipe : Pages.list(vzaar.recipes().list().results())) {
             if (!recipe.name.contains("[DND]") && !recipe.default) {
-                vzaar.recipeDelete(recipe.id)
+                vzaar.recipes().delete(recipe.id)
             }
         }
     }
 
-    private setupBaseTestData() {
-        Page<Video> videos = vzaar.videos(new VideoPageRequest());
+    private static setupBaseTestData() {
+        Page<Video> videos = vzaar.videos().list().results()
         for (int i = videos.totalCount; i < 3; ++i) {
             vzaar.upload(buildVideoUploadRequest(smallVideo))
         }
 
-        while (vzaar.videos(new VideoPageRequest()).totalCount < 3) {
+        while (vzaar.videos().list().results().totalCount < 3) {
             sleep(10000)
         }
     }
 
-    protected VideoUploadRequest buildVideoUploadRequest(File file) {
-        String uuid = UUID.randomUUID().toString();
+    protected static VideoUploadRequest buildVideoUploadRequest(File file) {
+        String uuid = UUID.randomUUID().toString()
         new VideoUploadRequest()
                 .withTitle("[DND] Integration Test Video ${uuid}")
                 .withDescription("Base integration data set video ${uuid} [DND]")

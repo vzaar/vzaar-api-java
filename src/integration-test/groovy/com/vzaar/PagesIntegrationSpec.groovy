@@ -5,19 +5,19 @@ class PagesIntegrationSpec extends BaseIntegrationSpec {
 
     def setupSpec() {
         categories = (1..5).collect {
-            vzaar.categoryCreate(new CategoryCreateRequest().withName("Category ${it}"))
+            vzaar.categories().create().withName("Category ${it}").result()
         }
     }
 
     def cleanupSpec() {
         categories.each {
-            vzaar.categoryDelete(it.id)
+            vzaar.categories().delete(it.id)
         }
     }
 
     def "I can collect all entries as a list"() {
         when:
-        Page<Category> firstPage = vzaar.categories(new CategoryPageRequest().withResultsPerPage(1))
+        Page<Category> firstPage = vzaar.categories().list().withResultsPerPage(1).results()
         List<Category> result = Pages.list(firstPage)
 
         then:
@@ -29,7 +29,7 @@ class PagesIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can collect all entries using an iterator to collate"() {
         when:
-        Page<Category> firstPage = vzaar.categories(new CategoryPageRequest().withResultsPerPage(1))
+        Page<Category> firstPage = vzaar.categories().list().withResultsPerPage(1).results()
         Iterator<Category> result = Pages.iterator(firstPage)
         List<Category> list = []
         while (result.hasNext()) {
@@ -45,7 +45,7 @@ class PagesIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can collect all entries using an iterable to collate"() {
         when:
-        Page<Category> firstPage = vzaar.categories(new CategoryPageRequest().withResultsPerPage(1))
+        Page<Category> firstPage = vzaar.categories().list().withResultsPerPage(1).results()
         List<Category> list = []
         for (Category category : Pages.iterable(firstPage)) {
             list.add(category)
@@ -60,10 +60,10 @@ class PagesIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can navigate back and for using the page object"() {
         given:
-        List<Category> all = Pages.list(vzaar.categories(new CategoryPageRequest()))
+        List<Category> all = Pages.list(vzaar.categories().list().results())
 
         when:
-        Page<Category> first = vzaar.categories(new CategoryPageRequest().withResultsPerPage(2));
+        Page<Category> first = vzaar.categories().list().withResultsPerPage(2).results()
 
         then:
         first.data.size() == 2

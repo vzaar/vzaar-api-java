@@ -1,15 +1,20 @@
 package com.vzaar;
 
+import com.vzaar.client.Resource;
 import com.vzaar.util.QueryEscaper;
 
-public class VideoPageRequest extends PageableRequest<VideoPageRequest> {
+public class VideoPageRequest extends PageableRequest<VideoPageRequest, Video> {
     private String q;
     private Integer categoryId;
     private Boolean categorised;
     private VideoState state;
 
-    public VideoPageRequest() {
-        super(VideoPageRequest.class);
+    VideoPageRequest() {
+        this(null);
+    }
+
+    VideoPageRequest(Resource<Video> resource) {
+        super(VideoPageRequest.class, resource);
     }
 
     /**
@@ -33,10 +38,10 @@ public class VideoPageRequest extends PageableRequest<VideoPageRequest> {
     }
 
     /**
-     * Search for videos belonging to the specified category. Note that there is a short
-     * delay between setting a category on a video and it being indexed so the video
+     * Search for videos belonging to the specified categories. Note that there is a short
+     * delay between setting a categories on a video and it being indexed so the video
      * may not appear in the search results immediately. Optional.
-     * @param categoryId the category id
+     * @param categoryId the categories id
      * @return this instance
      */
     public VideoPageRequest withCategoryId(Integer categoryId) {

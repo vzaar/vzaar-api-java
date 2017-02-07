@@ -1,19 +1,26 @@
 package com.vzaar;
 
+import com.vzaar.client.Resource;
+
 import java.util.List;
 
-public class CategoryPageRequest extends PageableRequest<CategoryPageRequest> {
+public class CategoryPageRequest extends PageableRequest<CategoryPageRequest, Category> {
 
     private Integer levels;
     private List<Integer> ids;
 
-    public CategoryPageRequest() {
-        super(CategoryPageRequest.class);
+    private CategoryPageRequest() {
+        this(null);
+    }
+
+    CategoryPageRequest(Resource<Category> resource) {
+        super(CategoryPageRequest.class, resource);
     }
 
     /**
-     * Set the depth of the category tree to return. For example setting it to 1
+     * Set the depth of the categories tree to return. For example setting it to 1
      * will return only root categories. Optional.
+     *
      * @param levels the number of levels of categories to retrieve
      * @return this instance
      */
@@ -28,7 +35,8 @@ public class CategoryPageRequest extends PageableRequest<CategoryPageRequest> {
 
     /**
      * Select the exact categories to return. This will not return child categories
-     * @param ids the category ids to return
+     *
+     * @param ids the categories ids to return
      * @return this instance
      */
     public CategoryPageRequest withIds(List<Integer> ids) {

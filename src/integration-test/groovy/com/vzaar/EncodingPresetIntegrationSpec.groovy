@@ -6,7 +6,7 @@ public class EncodingPresetIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can get encoding presets"() {
         when:
-        Page<EncodingPreset> page = vzaar.encodingPresets(new EncodingPresetPageRequest())
+        Page<EncodingPreset> page = vzaar.encodingPresets().list().results()
 
         then:
         page.totalCount >= 3
@@ -18,10 +18,10 @@ public class EncodingPresetIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can get an encoding preset"() {
         given:
-        Page<EncodingPreset> page = vzaar.encodingPresets(new EncodingPresetPageRequest().withResultsPerPage(1))
+        Page<EncodingPreset> page = vzaar.encodingPresets().list().withResultsPerPage(1).results()
 
         when:
-        EncodingPreset preset = vzaar.encodingPreset(page.data[0].id)
+        EncodingPreset preset = vzaar.encodingPresets().get(page.data[0].id)
 
         then:
         preset.id == page.data[0].id
@@ -30,11 +30,11 @@ public class EncodingPresetIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can paginate encoding presets"() {
         given:
-        List<EncodingPreset> presets = Pages.list(vzaar.encodingPresets(new EncodingPresetPageRequest()))
-        EncodingPresetPageRequest request = new EncodingPresetPageRequest().withResultsPerPage(1)
+        List<EncodingPreset> presets = Pages.list(vzaar.encodingPresets().list().results())
+        EncodingPresetPageRequest request = vzaar.encodingPresets().list().withResultsPerPage(1)
 
         when:
-        Page<EncodingPreset> page1 = vzaar.encodingPresets(request)
+        Page<EncodingPreset> page1 = request.results()
 
         then:
         page1.totalCount >= 3
@@ -59,17 +59,20 @@ public class EncodingPresetIntegrationSpec extends BaseIntegrationSpec {
     @Unroll("I can sort presets by #attribute")
     def "I can sort presets by attributes"() {
         given:
-        EncodingPresetPageRequest request = new EncodingPresetPageRequest().withResultsPerPage(2).withSortByAttribute(attribute).withSortDirection(SortDirection.asc)
+        EncodingPresetPageRequest request = vzaar.encodingPresets().list()
+                .withResultsPerPage(2)
+                .withSortByAttribute(attribute)
+                .withSortDirection(SortDirection.asc)
 
         when:
-        List<EncodingPreset> presets = Pages.list(vzaar.encodingPresets(request))
+        List<EncodingPreset> presets = Pages.list(request.results())
 
         then:
         presets.size() > 0
         presets.collect(map) == presets.collect(map).sort()
 
         when:
-        presets = Pages.list(vzaar.encodingPresets(request.withSortDirection(SortDirection.desc)))
+        presets = Pages.list(request.withSortDirection(SortDirection.desc).results())
 
         then:
         presets.size() > 0

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashSet;
 import java.util.Set;
 
-public class IngestRecipeStoreRequest {
+public class IngestRecipeStoreRequest<T> {
+    private final transient Class<T> type;
     private String name;
     private Set<Integer> encodingPresetIds;
     private String description;
@@ -19,13 +20,17 @@ public class IngestRecipeStoreRequest {
     private Boolean notifyByEmail;
     private Boolean notifyByPingback;
 
+    protected IngestRecipeStoreRequest(Class<T> type) {
+        this.type = type;
+    }
+
     /**
-     * Prepopulate the store request with the details from an existing recipe
+     * Prepopulate the store request with the details from an existing recipes
      *
-     * @param recipe the recipe whose details are to be copied
+     * @param recipe the recipes whose details are to be copied
      * @return this instance
      */
-    public IngestRecipeStoreRequest withIngestRecipe(IngestRecipe recipe) {
+    public T withIngestRecipe(IngestRecipe recipe) {
         this.name = recipe.getName();
         this.description = recipe.getDescription();
         this.encodingPresetIds = new HashSet<>(recipe.getEncodingPresetsIds());
@@ -37,30 +42,30 @@ public class IngestRecipeStoreRequest {
         this.sendToYoutube = recipe.isSendToYoutube();
         this.notifyByEmail = recipe.isNotifyByEmail();
         this.notifyByPingback = recipe.isNotifyByPingback();
-        return this;
+        return type.cast(this);
     }
 
     /**
-     * Set the name of the recipe. Mandatory for creating a recipe.
+     * Set the name of the recipes. Mandatory for creating a recipes.
      *
-     * @param name the name of the recipe
+     * @param name the name of the recipes
      * @return this instance
      */
-    public IngestRecipeStoreRequest withName(String name) {
+    public T withName(String name) {
         this.name = name;
-        return this;
+        return type.cast(this);
     }
 
     /**
-     * Set the encoding preset id values to associate with this recipe.
-     * Mandatory for creating a recipe
+     * Set the encoding preset id values to associate with this recipes.
+     * Mandatory for creating a recipes
      *
      * @param encodingPresetIds the encoding preset id values
      * @return this instance
      */
-    public IngestRecipeStoreRequest withEncodingPresetIds(Set<Integer> encodingPresetIds) {
+    public T withEncodingPresetIds(Set<Integer> encodingPresetIds) {
         this.encodingPresetIds = encodingPresetIds;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -69,21 +74,21 @@ public class IngestRecipeStoreRequest {
      * @param description the description
      * @return this instance
      */
-    public IngestRecipeStoreRequest withDescription(String description) {
+    public T withDescription(String description) {
         this.description = description;
-        return this;
+        return type.cast(this);
     }
 
     /**
-     * Flag this recipe as my default recipe. You can only have one default
-     * recipe. Optional.
+     * Flag this recipes as my default recipes. You can only have one default
+     * recipes. Optional.
      *
-     * @param isDefault true to set this as the default recipe
+     * @param isDefault true to set this as the default recipes
      * @return this instance
      **/
-    public IngestRecipeStoreRequest withDefault(Boolean isDefault) {
+    public T withDefault(Boolean isDefault) {
         this.isDefault = isDefault;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -93,9 +98,9 @@ public class IngestRecipeStoreRequest {
      * @param multipass use multipass encoding
      * @return this instance
      */
-    public IngestRecipeStoreRequest withMultipass(Boolean multipass) {
+    public T withMultipass(Boolean multipass) {
         this.multipass = multipass;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -104,9 +109,9 @@ public class IngestRecipeStoreRequest {
      * @param generateAnimatedThumb generate an animated gif thumbnail.
      * @return this instance
      */
-    public IngestRecipeStoreRequest withGenerateAnimatedThumb(Boolean generateAnimatedThumb) {
+    public T withGenerateAnimatedThumb(Boolean generateAnimatedThumb) {
         this.generateAnimatedThumb = generateAnimatedThumb;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -115,9 +120,9 @@ public class IngestRecipeStoreRequest {
      * @param generateSprite generate sprites
      * @return this instance
      */
-    public IngestRecipeStoreRequest withGenerateSprite(Boolean generateSprite) {
+    public T withGenerateSprite(Boolean generateSprite) {
         this.generateSprite = generateSprite;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -127,9 +132,9 @@ public class IngestRecipeStoreRequest {
      * @param useWatermark burn your watermark into the transcoded video.
      * @return this instance
      */
-    public IngestRecipeStoreRequest withUseWatermark(Boolean useWatermark) {
+    public T withUseWatermark(Boolean useWatermark) {
         this.useWatermark = useWatermark;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -139,9 +144,9 @@ public class IngestRecipeStoreRequest {
      * @param sendToYoutube send your video to your associated YouTube account
      * @return this instance
      */
-    public IngestRecipeStoreRequest withSendToYoutube(Boolean sendToYoutube) {
+    public T withSendToYoutube(Boolean sendToYoutube) {
         this.sendToYoutube = sendToYoutube;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -150,9 +155,9 @@ public class IngestRecipeStoreRequest {
      * @param notifyByEmail send email notification after video processing
      * @return this instance
      */
-    public IngestRecipeStoreRequest withNotifyByEmail(Boolean notifyByEmail) {
+    public T withNotifyByEmail(Boolean notifyByEmail) {
         this.notifyByEmail = notifyByEmail;
-        return this;
+        return type.cast(this);
     }
 
     /**
@@ -161,8 +166,8 @@ public class IngestRecipeStoreRequest {
      * @param notifyByPingback send http pingback after video processing
      * @return this instance
      */
-    public IngestRecipeStoreRequest withNotifyByPingback(Boolean notifyByPingback) {
+    public T withNotifyByPingback(Boolean notifyByPingback) {
         this.notifyByPingback = notifyByPingback;
-        return this;
+        return type.cast(this);
     }
 }

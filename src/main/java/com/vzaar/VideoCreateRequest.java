@@ -17,9 +17,9 @@ public class VideoCreateRequest {
     }
 
     /**
-     * The ingest recipe to use. The default ingest recipe will be used
+     * The ingest recipes to use. The default ingest recipes will be used
      * if not provided. Optional.
-     * @param ingestRecipeId the ingest recipe id
+     * @param ingestRecipeId the ingest recipes id
      * @return this instance
      */
     public VideoCreateRequest withIngestRecipeId(Integer ingestRecipeId) {

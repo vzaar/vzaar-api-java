@@ -18,8 +18,8 @@ public class VideoLinkUploadRequest {
     }
 
     /**
-     * The ingest recipe to use for the video. If missing then the default
-     * ingest recipe will be used. Optional.
+     * The ingest recipes to use for the video. If missing then the default
+     * ingest recipes will be used. Optional.
      * @param ingestRecipeId the ingest reciped id
      * @return this instance
      */

@@ -8,7 +8,7 @@ public class RateLimitingIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can check the rate limit"() {
         when:
-        vzaar.videos(new VideoPageRequest().withResultsPerPage(1))
+        vzaar.videos().list().withResultsPerPage(1).results()
         RateLimits limits = vzaar.getRateLimits()
 
         then:
@@ -20,7 +20,7 @@ public class RateLimitingIntegrationSpec extends BaseIntegrationSpec {
         limits.rateLimitWindowResetInMillis <= 75000
 
         when:
-        vzaar.videos(new VideoPageRequest().withResultsPerPage(1))
+        vzaar.videos().list().withResultsPerPage(1).results()
         RateLimits limits2 = vzaar.getRateLimits()
 
         then:

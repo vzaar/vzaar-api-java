@@ -1,14 +1,25 @@
 package com.vzaar;
 
+import com.vzaar.client.Resource;
+
 public class CategoryUpdateRequest {
+    private transient Resource<Category> resource;
     private String name;
     private Integer parentId;
     private Boolean moveToRoot;
 
+    private CategoryUpdateRequest() {
+        this(null);
+    }
+
+    CategoryUpdateRequest(Resource<Category> resource) {
+        this.resource = resource;
+    }
+
     /**
-     * Set the name of the category. Not setting the value will leave the
+     * Set the name of the categories. Not setting the value will leave the
      * current value unchanged. Optional.
-     * @param name the category name
+     * @param name the categories name
      * @return this instance
      */
     public CategoryUpdateRequest withName(String name) {
@@ -17,11 +28,11 @@ public class CategoryUpdateRequest {
     }
 
     /**
-     * Set the parent id of the category. Not setting the value will leave the
+     * Set the parent id of the categories. Not setting the value will leave the
      * current value unchanged. Optional.
      *
      * If moveToRoot is set then parentId should not be set
-     * @param parentId the category id of the new parent for this category
+     * @param parentId the categories id of the new parent for this categories
      * @return this instance
      */
     public CategoryUpdateRequest withParentId(Integer parentId) {
@@ -30,15 +41,19 @@ public class CategoryUpdateRequest {
     }
 
     /**
-     * Move the category to the root. Not setting the value will leave the
+     * Move the categories to the root. Not setting the value will leave the
      * current value unchanged. Optional.
      *
      * If parentId is set on the request then moveToRoot should not be set
-     * @param moveToRoot set to true to move a child node to a root category
+     * @param moveToRoot set to true to move a child node to a root categories
      * @return this instance
      */
     public CategoryUpdateRequest withMoveToRoot(boolean moveToRoot) {
         this.moveToRoot = moveToRoot ? true : null;
         return this;
+    }
+
+    public Category result() {
+        return resource.update(this);
     }
 }

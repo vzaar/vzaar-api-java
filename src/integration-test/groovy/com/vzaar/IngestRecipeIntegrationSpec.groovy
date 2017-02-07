@@ -13,9 +13,9 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
     private static List<IngestRecipe> recipes
 
     def setupSpec() {
-        encodingPresets = Pages.list(vzaar.encodingPresets(new EncodingPresetPageRequest()))
-        defaultRecipe = Pages.list(vzaar.recipes(new IngestRecipePageRequest())).find { it.default }
-        ir1 = vzaar.recipeCreate(new IngestRecipeStoreRequest()
+        encodingPresets = Pages.list(vzaar.encodingPresets().list().results())
+        defaultRecipe = Pages.list(vzaar.recipes().list().results()).find { it.default }
+        ir1 = vzaar.recipes().create()
                 .withName("Recipe 1")
                 .withDescription("Recipe 1 Description")
                 .withEncodingPresetIds([encodingPresets[0].id] as Set)
@@ -23,8 +23,9 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
                 .withGenerateSprite(false)
                 .withMultipass(false)
                 .withSendToYoutube(false)
-                .withUseWatermark(false))
-        ir2 = vzaar.recipeCreate(new IngestRecipeStoreRequest()
+                .withUseWatermark(false)
+                .result()
+        ir2 = vzaar.recipes().create()
                 .withName("Recipe 2")
                 .withDescription("Recipe 2 Description")
                 .withEncodingPresetIds([encodingPresets[0].id, encodingPresets[1].id] as Set)
@@ -32,18 +33,20 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
                 .withGenerateSprite(true)
                 .withMultipass(true)
                 .withSendToYoutube(true)
-                .withUseWatermark(true))
-        ir3 = vzaar.recipeCreate(new IngestRecipeStoreRequest()
+                .withUseWatermark(true)
+                .result()
+        ir3 = vzaar.recipes().create()
                 .withName("Recipe 3")
                 .withDescription("Recipe 3 Description")
-                .withEncodingPresetIds([encodingPresets[1].id] as Set))
+                .withEncodingPresetIds([encodingPresets[1].id] as Set)
+                .result()
         recipes = [ir1, ir2, ir3]
     }
 
     @Unroll("I can see the data from the server is correct #name")
     def "I can see the data from the server is correct"() {
         when:
-        IngestRecipe recipe = vzaar.recipe(category.id)
+        IngestRecipe recipe = vzaar.recipes().get(category.id)
 
         then:
         recipe.name == name
@@ -63,7 +66,7 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can list recipes"() {
         when:
-        Page<IngestRecipe> page = vzaar.recipes(new IngestRecipePageRequest());
+        Page<IngestRecipe> page = vzaar.recipes().list().results();
 
         then:
         page.totalCount >= 3
@@ -75,11 +78,11 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can page recipes"() {
         given:
-        List<IngestRecipe> recipes = Pages.list(vzaar.recipes(new IngestRecipePageRequest()))
-        IngestRecipePageRequest request = new IngestRecipePageRequest().withResultsPerPage(1)
+        List<IngestRecipe> recipes = Pages.list(vzaar.recipes().list().results())
+        IngestRecipePageRequest request = vzaar.recipes().list().withResultsPerPage(1)
 
         when:
-        Page<IngestRecipe> page1 = vzaar.recipes(request)
+        Page<IngestRecipe> page1 = request.results()
 
         then:
         page1.totalCount >= 3
@@ -115,17 +118,20 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
     @Unroll("I can sort recipes by #attribute")
     def "I can sort recipes by attributes"() {
         given:
-        IngestRecipePageRequest request = new IngestRecipePageRequest().withResultsPerPage(2).withSortByAttribute(attribute).withSortDirection(SortDirection.asc)
+        IngestRecipePageRequest request = vzaar.recipes().list()
+                .withResultsPerPage(2)
+                .withSortByAttribute(attribute)
+                .withSortDirection(SortDirection.asc)
 
         when:
-        List<IngestRecipe> recipes = Pages.list(vzaar.recipes(request))
+        List<IngestRecipe> recipes = Pages.list(request.results())
 
         then:
         recipes.size() > 0
         recipes.collect(map) == recipes.collect(map).sort()
 
         when:
-        recipes = Pages.list(vzaar.recipes(request.withSortDirection(SortDirection.desc)))
+        recipes = Pages.list(request.withSortDirection(SortDirection.desc).results())
 
         then:
         recipes.size() > 0
@@ -139,7 +145,7 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can update a category"() {
         when:
-        IngestRecipe recipe = vzaar.recipeCreate(new IngestRecipeStoreRequest()
+        IngestRecipe recipe = vzaar.recipes().create()
                 .withName("Updatable Recipe")
                 .withDescription("Updatable Recipe Description")
                 .withGenerateAnimatedThumb(true)
@@ -148,7 +154,8 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
                 .withMultipass(true)
                 .withGenerateSprite(true)
                 .withDefault(true)
-                .withEncodingPresetIds([encodingPresets[1].id] as Set))
+                .withEncodingPresetIds([encodingPresets[1].id] as Set)
+                .result()
         then:
         recipe.name == 'Updatable Recipe'
         recipe.description == 'Updatable Recipe Description'
@@ -161,8 +168,8 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
         recipe.default
 
         when:
-        vzaar.recipeUpdate(defaultRecipe.id, new IngestRecipeStoreRequest().withDefault(true))
-        recipe = vzaar.recipeUpdate(recipe.id, new IngestRecipeStoreRequest()
+        vzaar.recipes().update(defaultRecipe.id).withDefault(true).result();
+        recipe = vzaar.recipes().update(recipe.id)
                 .withName("Updated Recipe")
                 .withDescription("Updated Recipe Description")
                 .withGenerateAnimatedThumb(false)
@@ -170,7 +177,8 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
                 .withSendToYoutube(false)
                 .withMultipass(false)
                 .withGenerateSprite(false)
-                .withEncodingPresetIds([encodingPresets[0].id, encodingPresets[1].id] as Set))
+                .withEncodingPresetIds([encodingPresets[0].id, encodingPresets[1].id] as Set)
+                .result()
 
         then:
         recipe.name == 'Updated Recipe'
@@ -184,19 +192,20 @@ class IngestRecipeIntegrationSpec extends BaseIntegrationSpec {
         !recipe.default
 
         cleanup:
-        vzaar.recipeUpdate(defaultRecipe.id, new IngestRecipeStoreRequest().withDefault(true))
-        vzaar.recipeDelete(recipe.id)
+        vzaar.recipes().update(defaultRecipe.id).withDefault(true).result()
+        vzaar.recipes().delete(recipe.id)
     }
 
     def "I can delete a recipe"() {
         given:
-        IngestRecipe recipe = vzaar.recipeCreate(new IngestRecipeStoreRequest()
+        IngestRecipe recipe = vzaar.recipes().create()
                 .withName("Deletable Recipe")
-                .withEncodingPresetIds([encodingPresets[1].id] as Set))
+                .withEncodingPresetIds([encodingPresets[1].id] as Set)
+                .result()
 
         when:
-        vzaar.recipeDelete(recipe.id)
-        vzaar.recipe(recipe.id)
+        vzaar.recipes().delete(recipe.id)
+        vzaar.recipes().get(recipe.id)
 
         then:
         VzaarServerException exception = thrown(VzaarServerException)

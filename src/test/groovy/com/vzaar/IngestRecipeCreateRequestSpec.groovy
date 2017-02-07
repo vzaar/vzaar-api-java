@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.vzaar.util.ObjectMapperFactory
 import spock.lang.Specification
 
-class IngestRecipeStoreRequestSpec extends Specification {
+class IngestRecipeCreateRequestSpec extends Specification {
 
     private ObjectMapper mapper = ObjectMapperFactory.make()
 
     def "I can make the request to the expected JSON payload"() {
         given:
-        IngestRecipeStoreRequest request = new IngestRecipeStoreRequest()
+        IngestRecipeCreateRequest request = new IngestRecipeCreateRequest()
                 .withDefault(true)
                 .withDescription("Recipe description")
                 .withEncodingPresetIds([2, 3] as Set)
@@ -47,7 +47,7 @@ class IngestRecipeStoreRequestSpec extends Specification {
             {
               "data": {
                 "id": 1,
-                "name": "Ingest recipe 1",
+                "name": "Ingest recipes 1",
                 "recipe_type": "new_video",
                 "description": "Recipe description",
                 "account_id": 10,
@@ -105,7 +105,7 @@ class IngestRecipeStoreRequestSpec extends Specification {
         Lookup<IngestRecipe> entity = mapper.readValue(payload, new TypeReference<Lookup<IngestRecipe>>() {});
 
         when:
-        IngestRecipeStoreRequest request = new IngestRecipeStoreRequest()
+        IngestRecipeCreateRequest request = new IngestRecipeCreateRequest()
                 .withIngestRecipe(entity.data)
 
 
@@ -118,7 +118,7 @@ class IngestRecipeStoreRequestSpec extends Specification {
         result.get("generate_animated_thumb") == true
         result.get("generate_sprite") == true
         result.get("multipass") == true
-        result.get("name") == "Ingest recipe 1"
+        result.get("name") == "Ingest recipes 1"
         result.get("send_to_youtube") == true
         result.get("use_watermark") == true
         result.get("notify_by_email") == true

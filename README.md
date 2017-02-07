@@ -27,18 +27,19 @@ use default values if they are not set. Page counting starts from 1.
 The sort column, if available for sorting, is the attribute name in snake case. For example:
 
 ```
-    Page<Video> page = vzaar.videos(new VideoPageRequest()
+    Page<Video> page = vzaar.videos().list()
             .withPage(1)
             .withResultsPerPage(5)
             .withSortByAttribute("created_at")
-            .withSortDirection(SortDirection.desc));
+            .withSortDirection(SortDirection.desc)
+            .results();
 ```
 
 Paged requests return typed `Page` responses, which are able to request the first,
 next, previous pages.
 
 ```
-    Page<Video> page = vzaar.videos(new VideoPageRequest());
+    Page<Video> page = vzaar.videos().list().results();
     System.out.println("Total count = " + page.getTotalCount());
     System.out.println("Page count = " + page.getData().size());
     
@@ -46,7 +47,7 @@ next, previous pages.
         Page<Video> nextPage = page.getNext();
         
         // This is equivalent for a default search to 
-        nextPage = vzaar.videos(new VideoPageRequest().withPage(2))
+        nextPage = vzaar.videos().list().withPage(2).results();
     }
 ```
 
@@ -56,19 +57,19 @@ stream.
 
 ```
     // Collate all videos irrelevant of the number of pages 
-    List<Video> videos = Pages.list(vzaar.videos(new VideoPageRequest());
+    List<Video> videos = Pages.list(vzaar.videos().list().results());
     
     // An iterator that will return all the videos irrelevant
     // of the number of pages. Note that this calls subsequent pages
     // lazily so may be preferable to Pages.list if memory is an issue or 
     // there are early exit conditions from a loop
-    Iterator<Video> videos = Pages.iterator(vzaar.videos(new VideoPageRequest());
+    Iterator<Video> videos = Pages.iterator(vzaar.videos().list().results());
     while(videos.hasNext()) {
         Video video = videos.next();
     }
     
     // An iterable wrapper around the iterator
-    for (Video video : Pages.iterable(vzaar.videos(new VideoPageRequest())) {
+    for (Video video : Pages.iterable(vzaar.videos().list().results()) {
     }
 ```
 
