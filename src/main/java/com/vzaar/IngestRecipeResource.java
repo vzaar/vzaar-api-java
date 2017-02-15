@@ -15,7 +15,7 @@ public class IngestRecipeResource {
     }
 
     public IngestRecipe get(int ingestRecipeId) {
-        return resource().lookup(ingestRecipeId);
+        return id(ingestRecipeId).lookup();
     }
 
     public IngestRecipeCreateRequest create() {

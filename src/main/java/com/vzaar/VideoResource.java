@@ -15,7 +15,7 @@ public class VideoResource {
     }
 
     public Video get(int videoId) {
-        return resource().lookup(videoId);
+        return id(videoId).lookup();
     }
 
     public VideoUpdateRequest update(int videoId) {

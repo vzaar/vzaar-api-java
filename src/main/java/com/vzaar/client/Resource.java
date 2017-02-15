@@ -54,8 +54,8 @@ public class Resource<T> {
         return this;
     }
 
-    public T lookup(int id) {
-        this.id = id;
+    public T lookup() {
+        Objects.requireNonNull(id, "resource id has not been set");
         client.get(this);
         return getData();
     }
@@ -71,6 +71,7 @@ public class Resource<T> {
     }
 
     public void delete() {
+        Objects.requireNonNull(id, "resource id has not been set");
         client.delete(this);
     }
 
@@ -108,7 +109,7 @@ public class Resource<T> {
             Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
             return data.getData();
         } catch (IOException e) {
-            throw new VzaarException(e);
+            throw new VzaarException(e); // $COVERAGE-IGNORE$
         }
     }
 
@@ -118,7 +119,7 @@ public class Resource<T> {
             page.setResource(this);
             return page;
         } catch (IOException e) {
-            throw new VzaarException(e);
+            throw new VzaarException(e); // $COVERAGE-IGNORE$
         }
     }
 }

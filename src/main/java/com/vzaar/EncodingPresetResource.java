@@ -15,7 +15,7 @@ public class EncodingPresetResource {
     }
 
     public EncodingPreset get(int encodingPresetId) {
-        return resource().lookup(encodingPresetId);
+        return id(encodingPresetId).lookup();
     }
 
     private Resource<EncodingPreset> resource() {

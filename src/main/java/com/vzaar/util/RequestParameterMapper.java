@@ -50,7 +50,7 @@ public class RequestParameterMapper {
             }
             return values;
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(e); // $COVERAGE-IGNORE$
         }
     }
 
@@ -78,7 +78,7 @@ public class RequestParameterMapper {
             }
             return paramString.toString();
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(e); // $COVERAGE-IGNORE$
         }
     }
 
@@ -87,7 +87,7 @@ public class RequestParameterMapper {
             Map<String, Object> params = splitQuery(url);
             return objectMapper.readValue(objectMapper.writeValueAsString(params), type);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(e); // $COVERAGE-IGNORE$
         }
     }
 

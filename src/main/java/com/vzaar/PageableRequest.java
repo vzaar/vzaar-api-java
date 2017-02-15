@@ -16,10 +16,6 @@ public class PageableRequest<R, T> {
     private Integer page;
     private Integer perPage;
 
-    protected PageableRequest(Class<R> type) {
-        this(type, null);
-    }
-
     protected PageableRequest(Class<R> type, Resource<T> resource) {
         this.type = type;
         this.resource = resource;

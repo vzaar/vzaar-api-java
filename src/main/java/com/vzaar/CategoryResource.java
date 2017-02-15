@@ -19,7 +19,7 @@ public class CategoryResource {
     }
 
     public Category get(int categoryId) {
-        return id(categoryId).lookup(categoryId);
+        return id(categoryId).lookup();
     }
 
     public CategoryCreateRequest create() {
