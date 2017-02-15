@@ -2,6 +2,7 @@ package com.vzaar;
 
 import com.vzaar.client.RestClient;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,7 +44,9 @@ public class CustomUploader {
      */
     public void upload(UploadRequest request, File file) throws IOException {
         if (request.getType() == UploadType.single) {
-            client.s3(new FileInputStream(file), request, 0);
+            try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
+                client.s3(in, request, 0);
+            }
         } else {
             for (int i = 0; i < request.getUploadSignature().getParts(); ++i) {
                 uploadPart(request, file, i);
@@ -59,13 +62,14 @@ public class CustomUploader {
      * @throws IOException exception if error transmitting file
      */
     public void uploadPart(UploadRequest request, File file, int part) throws IOException {
-        RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
-        long pos = part * request.getUploadSignature().getPartSizeInBytes();
-        randomAccessFile.seek(pos);
-        client.s3(
-                Channels.newInputStream(randomAccessFile.getChannel()),
-                request,
-                part);
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+            long pos = part * request.getUploadSignature().getPartSizeInBytes();
+            randomAccessFile.seek(pos);
+            client.s3(
+                    Channels.newInputStream(randomAccessFile.getChannel()),
+                    request,
+                    part);
+        }
     }
 
     /**
