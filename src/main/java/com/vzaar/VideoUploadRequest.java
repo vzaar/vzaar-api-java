@@ -1,20 +1,22 @@
 package com.vzaar;
 
+import com.vzaar.client.RestClient;
+import com.vzaar.client.RestClientConfiguration;
+
 import java.io.File;
+import java.io.IOException;
 
 public class VideoUploadRequest {
+    private final transient RestClient client;
+
     private File file;
     private String uploader;
     private String title;
     private String description;
     private Integer ingestRecipeId;
 
-    public File getFile() {
-        return file;
-    }
-
-    public String getUploader() {
-        return uploader;
+    VideoUploadRequest(RestClient client) {
+        this.client = client;
     }
 
     public VideoUploadRequest withFile(File file) {
@@ -27,17 +29,9 @@ public class VideoUploadRequest {
         return this;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
     public VideoUploadRequest withTitle(String title) {
         this.title = title;
         return this;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public VideoUploadRequest withDescription(String description) {
@@ -45,12 +39,29 @@ public class VideoUploadRequest {
         return this;
     }
 
-    public Integer getIngestRecipeId() {
-        return ingestRecipeId;
-    }
-
     public VideoUploadRequest withIngestRecipeId(Integer ingestRecipeId) {
         this.ingestRecipeId = ingestRecipeId;
         return this;
+    }
+
+    public Video result() throws IOException {
+        CustomUploader service = new CustomUploader(client);
+        RestClientConfiguration configuration = client.getConfiguration();
+        UploadType type = file.length() > configuration.getUseMultipartWhenFileSizeOver()
+                ? UploadType.multipart
+                : UploadType.single;
+
+        UploadRequest uploadRequest = service.signature(type, new CreateSignatureRequest()
+                .withFile(file)
+                .withUploader(uploader)
+                .withDesiredPartSizeInMb(type == UploadType.multipart ? configuration.getDefaultDesiredChunkSizeInMb() : null));
+
+        service.upload(uploadRequest, file);
+
+        return service.createVideo(new VideoCreateRequest()
+                .withGuid(uploadRequest.getUploadSignature().getGuid())
+                .withTitle(title)
+                .withDescription(description)
+                .withIngestRecipeId(ingestRecipeId));
     }
 }

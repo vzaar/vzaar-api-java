@@ -76,7 +76,7 @@ public class RateLimits {
                 long blockFor = getRateLimitWindowResetInMillis() + 10000;
                 try {
                     headers.wait(blockFor);
-                } catch (InterruptedException ignore) { // $COVERAGE-IGNORE$
+                } catch (InterruptedException ignore) {
                 }
             }
         }

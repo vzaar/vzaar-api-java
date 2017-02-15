@@ -9,7 +9,7 @@ class VideoUploadRequestSpec extends Specification {
         File aFile = new File(getClass().classLoader.getResource("com/vzaar/VideoUploadRequest.class").getFile());
 
         when:
-        VideoUploadRequest request = new VideoUploadRequest()
+        VideoUploadRequest request = new VideoUploadRequest(null)
             .withUploader("ninelives")
             .withFile(aFile)
             .withDescription("something moved")

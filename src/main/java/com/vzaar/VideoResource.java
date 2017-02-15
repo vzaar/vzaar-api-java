@@ -22,8 +22,20 @@ public class VideoResource {
         return new VideoUpdateRequest(id(videoId));
     }
 
-    public void delete(int categoryId) {
-        id(categoryId).delete();
+    public void delete(int videoId) {
+        id(videoId).delete();
+    }
+
+    public VideoUploadRequest uploadWithFile() {
+        return new VideoUploadRequest(client);
+    }
+
+    public VideoLinkUploadRequest uploadWithLink() {
+        return new VideoLinkUploadRequest(client.resource(Video.class));
+    }
+
+    public CustomUploader getCustomUploader() {
+        return new CustomUploader(client);
     }
 
     private Resource<Video> resource() {

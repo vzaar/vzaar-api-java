@@ -109,7 +109,7 @@ public class Resource<T> {
             Lookup<T> data = client.getObjectMapper().readValue(body, wrapper(Lookup.class));
             return data.getData();
         } catch (IOException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 
@@ -119,7 +119,7 @@ public class Resource<T> {
             page.setResource(this);
             return page;
         } catch (IOException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 }

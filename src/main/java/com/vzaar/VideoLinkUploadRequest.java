@@ -1,11 +1,19 @@
 package com.vzaar;
 
+import com.vzaar.client.Resource;
+
 public class VideoLinkUploadRequest {
+    private transient Resource<Video> resource;
+
     private String url;
     private Integer ingestRecipeId;
     private String title;
     private String description;
     private String uploader;
+
+    VideoLinkUploadRequest(Resource<Video> resource) {
+        this.resource = resource;
+    }
 
     /**
      * The URL to a video that is to be uploaded to vzaar. Mandatory.
@@ -57,5 +65,9 @@ public class VideoLinkUploadRequest {
     public VideoLinkUploadRequest withUploader(String uploader) {
         this.uploader = uploader;
         return this;
+    }
+
+    public Video result() {
+        return resource.path("link_uploads").create(this);
     }
 }

@@ -18,7 +18,7 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
                 .withFilesize(NOT_QUITE_5GB)
 
         when:
-        UploadRequest uploadRequest = vzaar.customUploader.signature(UploadType.single, request)
+        UploadRequest uploadRequest = vzaar.videos().customUploader.signature(UploadType.single, request)
         UploadSignature signature = uploadRequest.uploadSignature;
 
         then:
@@ -51,7 +51,7 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
                 .withFilesize(EXACTLY_5GB)
 
         when:
-        vzaar.customUploader.signature(UploadType.single, request);
+        vzaar.videos().customUploader.signature(UploadType.single, request);
 
         then:
         VzaarServerException e = thrown(VzaarServerException)
@@ -70,7 +70,7 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
                 .withFilesize(EXACTLY_5GB)
 
         when:
-        UploadSignature signature = vzaar.customUploader.signature(UploadType.multipart, request).uploadSignature;
+        UploadSignature signature = vzaar.videos().customUploader.signature(UploadType.multipart, request).uploadSignature;
 
         then:
         signature.accessKeyId ==~ /[A-Z0-9]{20,}/
@@ -96,7 +96,7 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
                 .withFilesize(NOT_QUITE_5MB)
 
         when:
-        vzaar.customUploader.signature(UploadType.multipart, request);
+        vzaar.videos().customUploader.signature(UploadType.multipart, request);
 
         then:
         VzaarServerException e = thrown(VzaarServerException)
@@ -117,7 +117,7 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
                 .withDesiredPartSizeInMb(partSizeRequest)
 
         when:
-        UploadSignature signature = vzaar.customUploader.signature(UploadType.multipart, request).uploadSignature;
+        UploadSignature signature = vzaar.videos().customUploader.signature(UploadType.multipart, request).uploadSignature;
 
         then:
         signature.partSize == partSizeRequest + "MB"

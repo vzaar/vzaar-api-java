@@ -147,12 +147,13 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         ]
 
         when:
-        Video video = vzaar.upload(new VideoUploadRequest()
+        Video video = vzaar.videos().uploadWithFile()
                 .withTitle("Updateable Video")
                 .withDescription("Updateable video description")
                 .withUploader("Integration test")
                 .withIngestRecipeId(recipes[0].id)
-                .withFile(smallVideo));
+                .withFile(smallVideo)
+                .result();
 
         then:
         video.title == 'Updateable Video'
@@ -210,11 +211,12 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can upload a video via a link"() {
         when:
-        Video video = vzaar.upload(new VideoLinkUploadRequest()
+        Video video = vzaar.videos().uploadWithLink()
                 .withUrl("https://github.com/nine-lives/vzaar-sdk-java/raw/master/src/integration-test/resources/videos/small.mp4")
                 .withUploader("integration-test")
                 .withDescription("Link video description")
-                .withTitle("Link video"))
+                .withTitle("Link video")
+                .result()
 
         then:
         video.id

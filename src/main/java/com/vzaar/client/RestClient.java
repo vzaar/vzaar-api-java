@@ -104,7 +104,7 @@ public class RestClient {
         try {
             return execute(resource, new HttpGet(new URI(url)));
         } catch (IOException | URISyntaxException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 
@@ -112,7 +112,7 @@ public class RestClient {
         try {
             return execute(resource, new HttpGet(resource.getUri()));
         } catch (IOException | URISyntaxException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 
@@ -120,7 +120,7 @@ public class RestClient {
         try {
             return execute(resource, setPayload(new HttpPost(resource.getUri()), payload));
         } catch (IOException | URISyntaxException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 
@@ -128,7 +128,7 @@ public class RestClient {
         try {
             return execute(resource, setPayload(new HttpPatch(resource.getUri()), payload));
         } catch (IOException | URISyntaxException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 
@@ -136,7 +136,7 @@ public class RestClient {
         try {
             return execute(resource, new HttpDelete(resource.getUri()));
         } catch (IOException | URISyntaxException e) {
-            throw new VzaarException(e); // $COVERAGE-IGNORE$
+            throw new VzaarException(e);
         }
     }
 
@@ -200,7 +200,7 @@ public class RestClient {
             throw new VzaarServerException(
                     response.getStatusLine().getStatusCode(),
                     response.getStatusLine().getReasonPhrase(),
-                    new VzaarErrorList()); // $COVERAGE-IGNORE$
+                    new VzaarErrorList());
         }
     }
 

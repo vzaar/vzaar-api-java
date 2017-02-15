@@ -55,20 +55,17 @@ public class BaseIntegrationSpec extends Specification {
     private static setupBaseTestData() {
         Page<Video> videos = vzaar.videos().list().results()
         for (int i = videos.totalCount; i < 3; ++i) {
-            vzaar.upload(buildVideoUploadRequest(smallVideo))
+            String uuid = UUID.randomUUID().toString()
+            vzaar.videos().uploadWithFile()
+                    .withTitle("[DND] Integration Test Video ${uuid}")
+                    .withDescription("Base integration data set video ${uuid} [DND]")
+                    .withUploader("Integration test")
+                    .withFile(smallVideo)
+                    .result();
         }
 
         while (vzaar.videos().list().results().totalCount < 3) {
             sleep(10000)
         }
-    }
-
-    protected static VideoUploadRequest buildVideoUploadRequest(File file) {
-        String uuid = UUID.randomUUID().toString()
-        new VideoUploadRequest()
-                .withTitle("[DND] Integration Test Video ${uuid}")
-                .withDescription("Base integration data set video ${uuid} [DND]")
-                .withUploader("Integration test")
-                .withFile(file);
     }
 }

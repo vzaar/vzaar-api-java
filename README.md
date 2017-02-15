@@ -80,10 +80,11 @@ a local file.
  
 ```
     File videoFile = new File("myvideo.mp4");
-    Video video = vzaar.upload(new VideoUploadRequest()
+    Video video = vzaar.videos().uploadWithFile()
           .withTitle("My video title")
           .withUploader("Jack Smith")
-          .withFile(videoFile));
+          .withFile(videoFile)
+          .result();
 ```
 
 Note that this method will automatically decide whether the file should
@@ -107,10 +108,11 @@ object with it.
 You can also upload your video from a URL.
 
 ```
-    Video video = vzaar.upload(new CreateLinkUploadRequest()
+    Video video = vzaar.videos().uploadWithLink()
         .withTitle("My video title")
         .withUploader("Jack Smith")
-        .withUrl("https://www.example.com/my-video.com"));
+        .withUrl("https://www.example.com/my-video.com")
+        .result();
 ```
 
 If you need more control over your uploads you can call the `CustomUploader`
@@ -119,7 +121,7 @@ which will give you finer control over your uploads.
 ```
     File videoFile = new File("myvideo.mp4");
 
-    CustomUploader uploader = vzaar.getCustomUploader();
+    CustomUploader uploader = vzaar.videos().getCustomUploader();
 
     // Create the upload signature
     UploadRequest uploadRequest = uploader.signature(UploadType.multipart, new CreateSignatureRequest()
