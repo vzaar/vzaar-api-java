@@ -9,6 +9,9 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         while (vzaar.videos().list().withState(VideoState.processing).results().totalCount > 0) {
             try {
                 sleep(10000)
+                if (vzaar.videos().list().withState(VideoState.processing).results().totalCount == 0) {
+                    cleanupAll()
+                }
             } catch (Exception ignore) {
             }
         }
