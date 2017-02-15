@@ -5,7 +5,8 @@ import com.vzaar.client.Resource;
 /**
  * Base class for pageable requests
  *
- * @param <T>
+ * @param <R> the pageable request type
+ * @param <T> the entity type
  */
 public class PageableRequest<R, T> {
     private final transient Class<R> type;
