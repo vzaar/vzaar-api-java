@@ -9,9 +9,6 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         while (vzaar.videos().list().withState(VideoState.processing).results().totalCount > 0) {
             try {
                 sleep(10000)
-                if (vzaar.videos().list().withState(VideoState.processing).results().totalCount == 0) {
-                    cleanupAll()
-                }
             } catch (Exception ignore) {
             }
         }
@@ -19,11 +16,11 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can get videos"() {
         when:
-        Page<Video> page = vzaar.videos().list().results()
+        Page<Video> page = vzaar.videos().list().withEscapedQuery("[DND]").results()
 
         then:
-        page.totalCount >= 3
-        page.data.size() >= 3
+        page.totalCount == 3
+        page.data.size() == 3
         !page.hasNext()
         !page.hasPrevious()
         !page.hasLast()
@@ -33,14 +30,15 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can paginate videos"() {
         given:
-        List<Video> videos = Pages.list(vzaar.videos().list().results())
-        VideoPageRequest request = vzaar.videos().list().withResultsPerPage(1)
+        List<Video> videos = Pages.list(vzaar.videos().list().withEscapedQuery("[DND]").withSortByAttribute("id").results())
+        VideoPageRequest request = vzaar.videos().list().withEscapedQuery("[DND]").withSortByAttribute("id").withResultsPerPage(1)
 
         when:
         Page<Video> page1 = request.results()
 
         then:
-        page1.totalCount >= 3
+        videos.size() == 3
+        page1.totalCount == 3
         page1.data.size() == 1
         page1.hasNext()
         !page1.hasPrevious()
@@ -51,7 +49,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         Page<Video> page2 = request.withPage(2).results()
 
         then:
-        page2.totalCount >= 3
+        page2.totalCount == 3
         page2.data.size() == 1
         page2.hasNext()
         page2.hasPrevious()
@@ -62,7 +60,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
         Page<Video> page3 = request.withPage(3).results()
 
         then:
-        page3.totalCount >= 3
+        page3.totalCount == 3
         page3.data.size() == 1
         !page3.hasNext()
         page3.hasPrevious()
@@ -74,6 +72,7 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
     def "I can sort videos by attributes"() {
         given:
         VideoPageRequest request = vzaar.videos().list()
+                .withEscapedQuery("[DND]")
                 .withResultsPerPage(2)
                 .withSortByAttribute(attribute)
                 .withSortDirection(SortDirection.asc)
