@@ -8,8 +8,12 @@ apply from: "$rootDir/coverage.gradle"
 Properties versionProperties = new Properties();
 versionProperties.load(new File(rootDir, "src/main/resources/version.properties").newInputStream())
 version = versionProperties.getProperty("version")
+version = version += '-SNAPSHOT'
 group = 'com.vzaar'
 archivesBaseName = "vzaar-java-sdk"
+
+//println("u:" + hasProperty('ossrhUsername') ? ossrhUsername : '')
+//println ("p:" + hasProperty('ossrhPassword')? ossrhPassword : '')
 
 signing {
     required { gradle.taskGraph.hasTask('uploadArchives') }
@@ -91,20 +95,18 @@ artifacts {
     archives sourcesJar
 }
 
-//boolean release = true
-//version = version += (release ? '' : '-SNAPSHOT')
-
 uploadArchives {
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername') ? ossrhUsername : '', password: project.hasProperty('ossrhPassword')? ossrhPassword : '')
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                println "hp:" + project.hasProperty('ossrhUsername')
+                authentication(userName: (project.hasProperty('ossrhUsername') ? ossrhUsername : ''), password: (project.hasProperty('ossrhPassword')? ossrhPassword : ''))
             }
 
             pom.project {
