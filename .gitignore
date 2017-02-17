@@ -15,3 +15,5 @@ build/
 
 # This is here to stop publishing credentials from being checked in
 gradle.properties
+vzaar-sdk-java-publish
+vzaar-sdk-java-publish.zip
