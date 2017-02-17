@@ -4,6 +4,14 @@ import spock.lang.Specification
 
 class RestClientConfigurationSpec extends Specification {
 
+    private String version;
+
+    def setup() {
+        Properties versionProperties = new Properties();
+        versionProperties.load(RestClientConfiguration.class.getClassLoader().getResourceAsStream("version.properties"));
+        version = versionProperties.getProperty("version");
+    }
+
     def "The defaults are the defaults"() {
         when:
         RestClientConfiguration config = new RestClientConfiguration()
@@ -16,7 +24,8 @@ class RestClientConfigurationSpec extends Specification {
         config.maxConnectionsPerRoute == 20
         config.useMultipartWhenFileSizeInMbOver == 1024
         config.useMultipartWhenFileSizeOver == 1073741824l
-        config.userAgent == 'vzaar-sdk-java 2.0.0'
+        config.userAgent == "vzaar-java-sdk/${version}".toString()
+        version ==~ /2\.\d+\.\d+/
         !config.blockTillRateLimitReset
     }
 
@@ -29,7 +38,7 @@ class RestClientConfigurationSpec extends Specification {
             .withDefaultDesiredChunkSizeInMb(98)
             .withMaxConnectionsPerRoute(22)
             .withUseMultipartWhenFileSizeInMbOver(5)
-            .withUserAgent("ninelives 9.0.0")
+            .withUserAgent("ninelives/9.0.0")
             .withBlockTillRateLimitReset(true)
 
         then:
@@ -40,7 +49,7 @@ class RestClientConfigurationSpec extends Specification {
         config.maxConnectionsPerRoute == 22
         config.useMultipartWhenFileSizeInMbOver == 5
         config.useMultipartWhenFileSizeOver == 5242880l
-        config.userAgent == 'ninelives 9.0.0'
+        config.userAgent == "ninelives/9.0.0 vzaar-java-sdk/${version}".toString()
         config.blockTillRateLimitReset
     }
 
@@ -63,4 +72,5 @@ class RestClientConfigurationSpec extends Specification {
         IllegalArgumentException e = thrown(IllegalArgumentException)
         e.message == 'Single/Multipart file size boundary must be between 5MB and 5GB'
     }
+
 }

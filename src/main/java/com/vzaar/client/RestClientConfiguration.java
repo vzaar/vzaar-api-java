@@ -1,14 +1,23 @@
 package com.vzaar.client;
 
+import java.io.IOException;
+import java.util.Properties;
+
 public class RestClientConfiguration {
+    private final String sdkUserAgent;
+    private String userAgent;
     private String endpoint = "https://api.vzaar.com/api/v2";
     private String clientId;
     private String authToken;
-    private String userAgent = "vzaar-sdk-java 2.0.0";
     private int maxConnectionsPerRoute = 20;
     private int useMultipartWhenFileSizeInMbOver = 1024;
     private int defaultDesiredChunkSizeInMb = 128;
     private boolean blockTillRateLimitReset;
+
+    public RestClientConfiguration() {
+        sdkUserAgent = "vzaar-java-sdk/" + getVersion();
+        userAgent = sdkUserAgent;
+    }
 
     public String getEndpoint() {
         return endpoint;
@@ -102,7 +111,11 @@ public class RestClientConfiguration {
      * @return this instance
      */
     public RestClientConfiguration withUserAgent(String userAgent) {
-        this.userAgent = userAgent;
+        if (userAgent == null || userAgent.trim().isEmpty()) {
+            this.userAgent = sdkUserAgent;
+        } else {
+            this.userAgent = userAgent.trim() + " " + sdkUserAgent;
+        }
         return this;
     }
 
@@ -177,5 +190,15 @@ public class RestClientConfiguration {
     public RestClientConfiguration withBlockTillRateLimitReset(boolean blockTillRateLimitReset) {
         this.blockTillRateLimitReset = blockTillRateLimitReset;
         return this;
+    }
+
+    private String getVersion() {
+        try {
+            Properties versionProperties = new Properties();
+            versionProperties.load(RestClientConfiguration.class.getClassLoader().getResourceAsStream("version.properties"));
+            return versionProperties.getProperty("version");
+        } catch (IOException ignore) {
+            return "2.0.x";
+        }
     }
 }

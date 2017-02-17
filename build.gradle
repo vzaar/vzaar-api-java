@@ -5,8 +5,10 @@ apply plugin: 'signing'
 apply plugin: 'checkstyle'
 apply from: "$rootDir/coverage.gradle"
 
+Properties versionProperties = new Properties();
+versionProperties.load(new File(rootDir, "src/main/resources/version.properties").newInputStream())
+version = versionProperties.getProperty("version")
 group = 'com.vzaar'
-version = '2.0.0'
 
 signing {
     required { gradle.taskGraph.hasTask('uploadArchives') }
