@@ -139,7 +139,7 @@ public class RestClientConfiguration {
 
     /**
      * Set the boundary condition of file size to determine when multipart upload should be used. Defaults to 1024MB
-     *
+     * @param  useMultipartWhenFileSizeInMbOver the boundary condition in MB
      * @return this instance
      */
     public RestClientConfiguration withUseMultipartWhenFileSizeInMbOver(int useMultipartWhenFileSizeInMbOver) {

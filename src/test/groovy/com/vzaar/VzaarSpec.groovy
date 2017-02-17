@@ -18,7 +18,6 @@ class VzaarSpec extends Specification {
         config.maxConnectionsPerRoute == 20
         config.useMultipartWhenFileSizeInMbOver == 1024
         config.useMultipartWhenFileSizeOver == 1073741824l
-        config.userAgent == 'vzaar-sdk-java 2.0.0'
     }
 
     def "I can use the configuration object to create the api"() {

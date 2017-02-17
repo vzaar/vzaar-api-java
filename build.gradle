@@ -9,6 +9,7 @@ Properties versionProperties = new Properties();
 versionProperties.load(new File(rootDir, "src/main/resources/version.properties").newInputStream())
 version = versionProperties.getProperty("version")
 group = 'com.vzaar'
+archivesBaseName = "vzaar-java-sdk"
 
 signing {
     required { gradle.taskGraph.hasTask('uploadArchives') }
@@ -90,9 +91,7 @@ artifacts {
     archives sourcesJar
 }
 
-boolean release = true
-String snapshotUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
-String stagingUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+//boolean release = true
 //version = version += (release ? '' : '-SNAPSHOT')
 
 uploadArchives {
@@ -100,14 +99,18 @@ uploadArchives {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: (release ? stagingUrl : snapshotUrl)) {
-              authentication(userName: {sonatypeUsername}, password: {sonatypePassword})
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
             pom.project {
                name 'vzaar-sdk-java'
                packaging 'jar'
-               description 'Vzaar Client SDK'
+               description 'Vzaar Client Java SDK'
                url 'https://github.com/nine-lives/vzaar-sdk-java'
 
                scm {
@@ -128,6 +131,7 @@ uploadArchives {
                    developer {
                        id 'mgsmith57'
                        name 'Marc G. Smith'
+                       email 'marc@vzaar.com'
                    }
                }
            }

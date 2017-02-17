@@ -141,7 +141,7 @@ which will give you finer control over your uploads.
     }
 
     // Finally tell Vzaar that the video is uploaded
-    Vidoe video = uploader.createVideo()
+    Video video = uploader.createVideo()
             .withGuid(signature.getGuid())
             .withTitle("My Video Title")
             .result();
