@@ -5,15 +5,15 @@ import com.vzaar.client.Resource;
 public class IngestRecipeUpdateRequest extends IngestRecipeStoreRequest<IngestRecipeUpdateRequest> {
     private transient Resource<IngestRecipe> resource;
 
-    private IngestRecipeUpdateRequest() {
-        this(null);
-    }
-
     IngestRecipeUpdateRequest(Resource<IngestRecipe> resource) {
         super(IngestRecipeUpdateRequest.class);
         this.resource = resource;
     }
 
+    /**
+     * Update and get the updated ingest recipe for this request
+     * @return the updated ingest recipe
+     */
     public IngestRecipe result() {
         return resource.update(this);
     }

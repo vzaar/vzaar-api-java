@@ -11,39 +11,43 @@ public class PageMetadata {
     private int totalCount;
     private Map<String, String> links;
 
-    public int getTotalCount() {
+    int getTotalCount() {
         return totalCount;
     }
 
-    public boolean hasFirstLink() {
+    /**
+     * Does the metadata contain a link for the first page
+     * @return true if it does
+     */
+    boolean hasFirstLink() {
         return getFirstLink() != null;
     }
 
-    public String getFirstLink() {
+    String getFirstLink() {
         return links.get(LINK_FIRST);
     }
 
-    public boolean hasNextLink() {
+    boolean hasNextLink() {
         return getNextLink() != null;
     }
 
-    public String getNextLink() {
+    String getNextLink() {
         return links.get(LINK_NEXT);
     }
 
-    public boolean hasPreviousLink() {
+    boolean hasPreviousLink() {
         return getPreviousLink() != null;
     }
 
-    public String getPreviousLink() {
+    String getPreviousLink() {
         return links.get(LINK_PREVIOUS);
     }
 
-    public boolean hasLastLink() {
+    boolean hasLastLink() {
         return getLastLink() != null;
     }
 
-    public String getLastLink() {
+    String getLastLink() {
         return links.get(LINK_LAST);
     }
 }

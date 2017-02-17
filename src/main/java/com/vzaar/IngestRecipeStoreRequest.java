@@ -20,7 +20,7 @@ public class IngestRecipeStoreRequest<T> {
     private Boolean notifyByEmail;
     private Boolean notifyByPingback;
 
-    protected IngestRecipeStoreRequest(Class<T> type) {
+    IngestRecipeStoreRequest(Class<T> type) {
         this.type = type;
     }
 
@@ -46,7 +46,7 @@ public class IngestRecipeStoreRequest<T> {
     }
 
     /**
-     * Set the name of the recipes. Mandatory for creating a recipes.
+     * Set the name of the recipes. Required for creating a recipes.
      *
      * @param name the name of the recipes
      * @return this instance
@@ -58,7 +58,7 @@ public class IngestRecipeStoreRequest<T> {
 
     /**
      * Set the encoding preset id values to associate with this recipes.
-     * Mandatory for creating a recipes
+     * Required for creating a recipes
      *
      * @param encodingPresetIds the encoding preset id values
      * @return this instance

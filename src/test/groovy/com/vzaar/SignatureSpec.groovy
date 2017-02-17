@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.vzaar.util.ObjectMapperFactory
 import spock.lang.Specification
 
-class UploadSignatureSpec extends Specification {
+class SignatureSpec extends Specification {
     private ObjectMapper mapper;
 
     def setup() {
@@ -36,7 +36,7 @@ class UploadSignatureSpec extends Specification {
        '''
 
         when:
-        Lookup<UploadSignature> entity = mapper.readValue(payload, new TypeReference<Lookup<UploadSignature>>() {});
+        Lookup<Signature> entity = mapper.readValue(payload, new TypeReference<Lookup<Signature>>() {});
 
         then:
         with(entity.data) {

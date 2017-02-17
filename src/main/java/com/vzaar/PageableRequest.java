@@ -66,6 +66,10 @@ public class PageableRequest<R, T> {
         return type.cast(this);
     }
 
+    /**
+     * Send the search / listing request
+     * @return the results for the request
+     */
     public Page<T> results() {
         return resource.page(this);
     }

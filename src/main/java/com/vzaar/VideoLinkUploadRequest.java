@@ -16,7 +16,7 @@ public class VideoLinkUploadRequest {
     }
 
     /**
-     * The URL to a video that is to be uploaded to vzaar. Mandatory.
+     * The URL to a video that is to be uploaded to vzaar. Required.
      * @param url the video url
      * @return this instance
      */
@@ -49,7 +49,7 @@ public class VideoLinkUploadRequest {
 
     /**
      * The description for the video. Optional.
-     * @param description the video descriptio
+     * @param description the video description.
      * @return this instance
      */
     public VideoLinkUploadRequest withDescription(String description) {
@@ -58,7 +58,7 @@ public class VideoLinkUploadRequest {
     }
 
     /**
-     * Uploader description used for metadata, analytics and support. Mandatory.
+     * Uploader description used for metadata, analytics and support. Required.
      * @param uploader the uploader description
      * @return this instance
      */
@@ -67,6 +67,10 @@ public class VideoLinkUploadRequest {
         return this;
     }
 
+    /**
+     * Send the request to create the video from the link
+     * @return the created video
+     */
     public Video result() {
         return resource.path("link_uploads").create(this);
     }

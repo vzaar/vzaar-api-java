@@ -124,24 +124,27 @@ which will give you finer control over your uploads.
     CustomUploader uploader = vzaar.videos().getCustomUploader();
 
     // Create the upload signature
-    UploadRequest uploadRequest = uploader.signature(UploadType.multipart, new CreateSignatureRequest()
+    Signature signature = uploader.signature()
+            .withType(UploadType.multipart)
             .withFile(videoFile)
             .withUploader("Jack Smith")
-            .withDesiredPartSizeInMb(64);
+            .withDesiredPartSizeInMb(64)
+            .result();
 
     // Do one of a or b below
     // a) This will upload all the chunks sequentially before returning
-    uploader.upload(uploadRequest, videoFile);
+    uploader.upload(signature, videoFile);
     
     // b) Alternatively you could call the uploading of chunks separately
     for (int i = 0; i < uploadRequest.getUploadSignature().getParts(); ++i) {
-        uploader.uploadPart(uploadRequest, videoFile, i);
+        uploader.uploadPart(signature, videoFile, i);
     }
 
     // Finally tell Vzaar that the video is uploaded
-    return uploader.createVideo(new CreateVideoRequest()
-            .withGuid(uploadRequest.getUploadSignature().getGuid())
-            .withTitle("My Video Title"));
+    Vidoe video = uploader.createVideo()
+            .withGuid(signature.getGuid())
+            .withTitle("My Video Title")
+            .result();
     
 
 ```

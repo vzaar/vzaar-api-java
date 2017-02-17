@@ -11,23 +11,19 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
     private static final long EXACTLY_16MB = 16l * 1024l * 1024l;
 
     def "I can create a single part signature with all the request fields"() {
-        given:
-        CreateSignatureRequest request = new CreateSignatureRequest()
+        when:
+        Signature signature = vzaar.videos().customUploader.signature()
+                .withUploadType(UploadType.single)
                 .withFilename("my_video.mp4")
                 .withUploader("vzaar-java-sdk 1.0")
                 .withFilesize(NOT_QUITE_5GB)
-
-        when:
-        UploadRequest uploadRequest = vzaar.videos().customUploader.signature(UploadType.single, request)
-        UploadSignature signature = uploadRequest.uploadSignature;
+                .result()
 
         then:
-        uploadRequest.type == UploadType.single
-        uploadRequest.createSignatureRequest.filename == 'my_video.mp4'
-        uploadRequest.createSignatureRequest.filesize == NOT_QUITE_5GB
-        uploadRequest.createSignatureRequest.uploader == 'vzaar-java-sdk 1.0'
-
-
+        signature.type == UploadType.single
+        signature.filename == 'my_video.mp4'
+        signature.filesize == NOT_QUITE_5GB
+        signature.uploader == 'vzaar-java-sdk 1.0'
         signature.accessKeyId ==~ /[A-Z0-9]{20,}/
         signature.key ==~ /vzaar\/.+\/\$\{filename\}/
         signature.acl == 'private'
@@ -44,14 +40,13 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
     }
 
     def "I get an error if I try to create single part signature for a file of 5GiB or over"() {
-        given:
-        CreateSignatureRequest request = new CreateSignatureRequest()
+        when:
+        vzaar.videos().customUploader.signature()
+                .withUploadType(UploadType.single)
                 .withFilename("my_video")
                 .withUploader("vzaar-java-sdk 1.0")
                 .withFilesize(EXACTLY_5GB)
-
-        when:
-        vzaar.videos().customUploader.signature(UploadType.single, request);
+                .result()
 
         then:
         VzaarServerException e = thrown(VzaarServerException)
@@ -63,14 +58,13 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
     }
 
     def "I can create a multipart signature with all the request fields"() {
-        given:
-        CreateSignatureRequest request = new CreateSignatureRequest()
+        when:
+        Signature signature = vzaar.videos().customUploader.signature()
+                .withUploadType(UploadType.multipart)
                 .withFilename("my_video")
                 .withUploader("vzaar-java-sdk 1.0")
                 .withFilesize(EXACTLY_5GB)
-
-        when:
-        UploadSignature signature = vzaar.videos().customUploader.signature(UploadType.multipart, request).uploadSignature;
+                .result()
 
         then:
         signature.accessKeyId ==~ /[A-Z0-9]{20,}/
@@ -89,14 +83,13 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
     }
 
     def "I get an error if I try to create multipart signature for a file smaller than 5GiB"() {
-        given:
-        CreateSignatureRequest request = new CreateSignatureRequest()
+        when:
+        vzaar.videos().customUploader.signature()
+                .withUploadType(UploadType.multipart)
                 .withFilename("my_video")
                 .withUploader("vzaar-java-sdk 1.0")
                 .withFilesize(NOT_QUITE_5MB)
-
-        when:
-        vzaar.videos().customUploader.signature(UploadType.multipart, request);
+                .result()
 
         then:
         VzaarServerException e = thrown(VzaarServerException)
@@ -109,15 +102,14 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
 
     @Unroll("I can submit various desired chunk sizes - using #partSizeRequest")
     def "I can submit various desired chunk sizes"() {
-        given:
-        CreateSignatureRequest request = new CreateSignatureRequest()
+        when:
+        Signature signature = vzaar.videos().customUploader.signature()
+                .withUploadType(UploadType.multipart)
                 .withFilename("my_video")
                 .withUploader("vzaar-java-sdk 1.0")
                 .withFilesize(EXACTLY_5GB)
                 .withDesiredPartSizeInMb(partSizeRequest)
-
-        when:
-        UploadSignature signature = vzaar.videos().customUploader.signature(UploadType.multipart, request).uploadSignature;
+                .result()
 
         then:
         signature.partSize == partSizeRequest + "MB"

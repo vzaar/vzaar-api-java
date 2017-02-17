@@ -53,6 +53,10 @@ public class CategoryUpdateRequest {
         return this;
     }
 
+    /**
+     * Send the update request and retrieve the updated category
+     * @return the updated category
+     */
     public Category result() {
         return resource.update(this);
     }

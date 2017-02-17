@@ -80,6 +80,10 @@ public class VideoUpdateRequest {
         return this;
     }
 
+    /**
+     * Send the updates and retrieve the updated video
+     * @return the updated video
+     */
     public Video result() {
         return resource.update(this);
     }

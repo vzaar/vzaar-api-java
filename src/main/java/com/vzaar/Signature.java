@@ -3,7 +3,9 @@ package com.vzaar;
 import com.vzaar.client.ResourcePath;
 
 @ResourcePath(path = "signature")
-public class UploadSignature {
+public class Signature {
+    private transient SignatureRequest request;
+
     private String accessKeyId;
     private String key;
     private String acl;
@@ -68,5 +70,26 @@ public class UploadSignature {
 
     public int getParts() {
         return parts;
+    }
+
+    Signature withSignatureRequest(SignatureRequest request) {
+        this.request = request;
+        return this;
+    }
+
+    public UploadType getType() {
+        return request.getType();
+    }
+
+    public String getFilename() {
+        return request.getFilename();
+    }
+
+    public long getFilesize() {
+        return request.getFilesize();
+    }
+
+    public String getUploader() {
+        return request.getUploader();
     }
 }

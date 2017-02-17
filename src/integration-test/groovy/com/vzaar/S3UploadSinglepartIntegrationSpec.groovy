@@ -4,21 +4,23 @@ public class S3UploadSinglepartIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can upload a video in a single part"() {
         given:
-        UploadRequest uploadRequest = vzaar.videos().customUploader.signature(UploadType.single, new CreateSignatureRequest()
+        Signature signature = vzaar.videos().customUploader.signature()
+                .withUploadType(UploadType.single)
                 .withFile(smallVideo)
                 .withUploader("java-integration-test")
-                .withFilesize(smallVideo.size()))
+                .withFilesize(smallVideo.size())
+                .result()
 
         when:
-        vzaar.videos().customUploader.upload(uploadRequest, smallVideo);
-        Video entity = vzaar.videos().customUploader.createVideo(new VideoCreateRequest()
-                .withGuid(uploadRequest.uploadSignature.guid)
-                .withTitle("Integration test ${uploadRequest.uploadSignature.guid}")
-                .withDescription("From the java sdk integration tests"))
-
+        vzaar.videos().customUploader.upload(signature, smallVideo);
+        Video entity = vzaar.videos().customUploader.createVideo()
+                .withGuid(signature.guid)
+                .withTitle("Integration test ${signature.guid}")
+                .withDescription("From the java sdk integration tests")
+                .result()
 
         then:
-        entity.title == "Integration test ${uploadRequest.uploadSignature.guid}"
+        entity.title == "Integration test ${signature.guid}".toString()
         entity.description == "From the java sdk integration tests"
     }
 }

@@ -3,8 +3,7 @@ package com.vzaar.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vzaar.RateLimits;
-import com.vzaar.UploadRequest;
-import com.vzaar.UploadSignature;
+import com.vzaar.Signature;
 import com.vzaar.UploadType;
 import com.vzaar.VzaarErrorList;
 import com.vzaar.VzaarException;
@@ -67,14 +66,13 @@ public class RestClient {
         return new Resource<>(this, type);
     }
 
-    public String s3(InputStream in, UploadRequest uploadRequest, int part) throws IOException {
-        UploadSignature signature = uploadRequest.getUploadSignature();
+    public String s3(InputStream in, Signature signature, int part) throws IOException {
         HttpPost request = new HttpPost(signature.getUploadHostname());
-        String fileSuffix = uploadRequest.getType() == UploadType.multipart ? "." + part : "";
-        String fileName = uploadRequest.getCreateSignatureRequest().getFilename();
-        ContentBody body = new FileStreamingBody(in, fileName, uploadRequest.getType() == UploadType.multipart
-                ? uploadRequest.getUploadSignature().getPartSizeInBytes()
-                : uploadRequest.getCreateSignatureRequest().getFilesize());
+        String fileSuffix = signature.getType() == UploadType.multipart ? "." + part : "";
+        String fileName = signature.getFilename();
+        ContentBody body = new FileStreamingBody(in, fileName, signature.getType() == UploadType.multipart
+                ? signature.getPartSizeInBytes()
+                : signature.getFilesize());
 
         request.addHeader("User-agent", configuration.getUserAgent());
         request.addHeader("x-amz-acl", signature.getAcl());
@@ -86,7 +84,7 @@ public class RestClient {
                 .addTextBody("bucket", signature.getBucket())
                 .addTextBody("policy", signature.getPolicy())
                 .addTextBody("success_action_status", signature.getSuccessActionStatus())
-                .addTextBody("x-amz-meta-uploader", uploadRequest.getCreateSignatureRequest().getUploader())
+                .addTextBody("x-amz-meta-uploader", signature.getUploader())
                 .addTextBody("key", signature.getKey() + fileSuffix)
                 .addPart("file", body)
                 .build());

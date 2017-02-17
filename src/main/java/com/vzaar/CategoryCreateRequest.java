@@ -16,7 +16,7 @@ public class CategoryCreateRequest {
     }
 
     /**
-     * Set the name of the categories. Mandatory.
+     * Set the name of the categories. Required.
      * @param name the name
      * @return this instance
      */
@@ -35,6 +35,10 @@ public class CategoryCreateRequest {
         return this;
     }
 
+    /**
+     * Create the category and return the new category
+     * @return the created category
+     */
     public Category result() {
         return resource.create(this);
     }

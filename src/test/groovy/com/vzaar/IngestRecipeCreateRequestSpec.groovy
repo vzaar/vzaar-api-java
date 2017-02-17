@@ -11,7 +11,7 @@ class IngestRecipeCreateRequestSpec extends Specification {
 
     def "I can make the request to the expected JSON payload"() {
         given:
-        IngestRecipeCreateRequest request = new IngestRecipeCreateRequest()
+        IngestRecipeCreateRequest request = new IngestRecipeCreateRequest(null)
                 .withDefault(true)
                 .withDescription("Recipe description")
                 .withEncodingPresetIds([2, 3] as Set)
