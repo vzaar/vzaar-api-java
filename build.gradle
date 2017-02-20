@@ -101,7 +101,6 @@ uploadArchives {
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                println "hp:" + project.hasProperty('ossrhUsername')
                 authentication(userName: (project.hasProperty('ossrhUsername') ? ossrhUsername : ''), password: (project.hasProperty('ossrhPassword')? ossrhPassword : ''))
             }
 

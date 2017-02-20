@@ -69,11 +69,9 @@ public class RestClient {
     public String s3(InputStream in, Signature signature, int part) throws IOException {
         HttpPost request = new HttpPost(signature.getUploadHostname());
         String fileSuffix = signature.getType() == UploadType.multipart ? "." + part : "";
-        String fileName = signature.getFilename();
-        ContentBody body = new FileStreamingBody(in, fileName, signature.getType() == UploadType.multipart
+        ContentBody body = new FileStreamingBody(in, signature.getFilename(), signature.getType() == UploadType.multipart
                 ? signature.getPartSizeInBytes()
                 : signature.getFilesize());
-
         request.addHeader("User-agent", configuration.getUserAgent());
         request.addHeader("x-amz-acl", signature.getAcl());
         request.addHeader("Enclosure-Type", "multipart/form-data");
