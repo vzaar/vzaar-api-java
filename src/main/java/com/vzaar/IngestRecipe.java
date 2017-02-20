@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @ResourcePath(path = "ingest_recipes")
-public class IngestRecipe {
+public class IngestRecipe implements Identifiable  {
     private int id;
     private String name;
     private String recipeType;

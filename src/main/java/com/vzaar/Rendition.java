@@ -1,6 +1,6 @@
 package com.vzaar;
 
-public class Rendition {
+public class Rendition implements Identifiable  {
     private int id;
     private Integer width;
     private Integer height;

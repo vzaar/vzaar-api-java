@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @ResourcePath(path = "videos")
-public class Video {
+public class Video implements Identifiable {
     private int id;
     private String title;
     private Integer userId;

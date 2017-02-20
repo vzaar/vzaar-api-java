@@ -171,6 +171,47 @@ which will give you finer control over your uploads.
 
 ```
 
+## Utility Classes
+
+There is an `Identifiables` class that allows you to collect ids, check if 
+an id exists, find a domain entity by id or index the objects by id.
+
+```
+    List<EncodingPreset> presets = Page.list(vzaar.encodingPresets().list().results());
+
+    // Collect the ids
+    Set<Integer> presetIds = Identifiables.collect(presets);
+     
+    // Check if an id exists
+    boolean exists = Identifiables.hasId(presets, 42);
+         
+    // Get the entity by id
+    EncodingPreset preset = Identifiables.find(presets, 42);
+         
+    // Map by id
+    Map<Integer, EncodingPreset> idMap = Identifiables.index(presets);     
+```
+
+To build out the category tree structure you can use the `CategoryTreeBuilder` utility
+class. By default the children, including the root nodes are sorted by the category
+name. You can change the sort order by passing in your own comparator.
+
+```
+    List<Category> categories = Page.list(vzaar.categories().list().results());
+    
+    // Build the tree, this returns all the root categories, 
+    // i.e. those without a parent id
+    List<CategoryNode> treeRoots = CategoryTreeBuilder.build(categories);
+    
+    CategoryNode firstRootNode = treeRoots.get(0);
+    firstRootNode.getCategory();         // the category
+    firstRootNode.hasChildren();         // are there any children?
+    firstRootNode.getChildCount();       // the total count of direct children
+    firstRootNode.getDescendantCount();  // the total count of all decendants
+    firstRootNode.getChildren();         // get the direct children nodes 
+    
+```
+
 ## Custom Configuration
 
 You can also use `RestClientConfiguration` to configure the SDK. Apart

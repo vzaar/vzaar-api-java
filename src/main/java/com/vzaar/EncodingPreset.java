@@ -5,7 +5,7 @@ import com.vzaar.client.ResourcePath;
 import java.time.ZonedDateTime;
 
 @ResourcePath(path = "encoding_presets")
-public class EncodingPreset {
+public class EncodingPreset implements Identifiable  {
     private int id;
     private String name;
     private String description;

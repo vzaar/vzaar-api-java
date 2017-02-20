@@ -1,6 +1,6 @@
 package com.vzaar;
 
-public class LegacyRendition {
+public class LegacyRendition implements Identifiable  {
     private int id;
     private String type;
     private Integer width;

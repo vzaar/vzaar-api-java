@@ -5,7 +5,7 @@ import com.vzaar.client.ResourcePath;
 import java.time.ZonedDateTime;
 
 @ResourcePath(path = "categories")
-public class Category {
+public class Category implements Identifiable {
     private int id;
     private int accountId;
     private int userId;
