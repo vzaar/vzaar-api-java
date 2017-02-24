@@ -159,7 +159,7 @@ which will give you finer control over your uploads.
     uploader.upload(signature, videoFile);
     
     // b) Alternatively you could call the uploading of chunks separately
-    for (int i = 0; i < uploadRequest.getUploadSignature().getParts(); ++i) {
+    for (int i = 0; i < signature.getParts(); ++i) {
         uploader.uploadPart(signature, videoFile, i);
     }
 
