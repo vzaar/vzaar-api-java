@@ -85,4 +85,13 @@ public final class Vzaar {
     public EncodingPresetResource encodingPresets() {
         return new EncodingPresetResource(client);
     }
+
+    /**
+     * Get the playlist resource to list and fetch playlists.
+     * @return a playlist resource
+     */
+    public PlaylistResource playlists() {
+        return new PlaylistResource(client);
+    }
+
 }

@@ -50,6 +50,12 @@ public class BaseIntegrationSpec extends Specification {
                 vzaar.recipes().delete(recipe.id)
             }
         }
+
+        for (Playlist playlist : Pages.list(vzaar.playlists().list().results())) {
+            if (!playlist.title.contains("[DND]")) {
+                vzaar.recipes().delete(playlist.id)
+            }
+        }
     }
 
     private static setupBaseTestData() {
