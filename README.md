@@ -245,12 +245,6 @@ from the the client id and auth token all the other values have defaults.
 Once you have checked out the project you can build and test the project with the following command:
 
 ```
-    gradlew -DvzaarClientId=<your-client-id> -DvzaarAuthToken=<your-authentication-token> check 
-```
-
-If you do not have credentials you can ignore the integration and coverage tests as follows:
-
-```
     gradlew check -x integrationTest -x jacocoTestReport
 ```
 
