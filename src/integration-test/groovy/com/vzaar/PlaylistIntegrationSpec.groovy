@@ -54,7 +54,7 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
         playlists = [p1, p2, p3]
     }
 
-    @Unroll("I can see the data from the server is correct #name")
+    @Unroll("I can see the data from the server is correct #title")
     def "I can see the data from the server is correct"() {
         when:
         Playlist entity = vzaar.playlists().get(playlist.id)
@@ -77,7 +77,7 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
         playlist | title        | categoryId | sortOrder          | sortBy       | maxVids | position                | isPrivate | dimensions | autoplay | continuousPlay
         p1       | 'Playlist 1' | c1.id      | SortDirection.asc  | "created_at" | 41      | ControlsPosition.top    | true      | '640x480'  | true     | true
         p2       | 'Playlist 2' | c2.id      | SortDirection.desc | "title"      | 42      | ControlsPosition.bottom | false     | '650x490'  | true     | false
-        p3       | 'Playlist 3' | c1.id      | SortDirection.asc  | "title"      | 43      | ControlsPosition.left   | false     | 'auto'     | false    | false
+        p3       | 'Playlist 3' | c1.id      | SortDirection.asc  | "title"      | 43      | ControlsPosition.left   | false     | 'auto'     | false    | true
     }
 
     def "I can list playlists"() {
@@ -154,12 +154,12 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
         playlists.collect(map) == playlists.collect(map).sort().reverse()
 
         where:
-        attribute | map
-        'id'      | { it.id }
-        'title'   | { it.title }
+        attribute    | map
+        'created_at' | { it.createdAt }
+        'title'      | { it.title }
     }
 
-    def "I can update a playliast"() {
+    def "I can update a playlist"() {
         when:
         Playlist entity = vzaar.playlists().create()
                 .withTitle("Updatable Playlist")
@@ -200,13 +200,13 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
                 .result()
 
         then:
-        entity.title == 'Updatable Playlist'
+        entity.title == 'Updated Playlist'
         entity.categoryId == c2.id
         entity.sortOrder == SortDirection.desc
         entity.sortBy == 'title'
         entity.maxVids == 21
         entity.position == ControlsPosition.bottom
-       ! entity.private
+        !entity.private
         entity.dimensions == '1280x960'
         !entity.autoplay
         !entity.continuousPlay
@@ -215,7 +215,7 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
         vzaar.playlists().delete(entity.id)
     }
 
-    def "I can delete a recipe"() {
+    def "I can delete a playlist"() {
         given:
         Playlist playlist = vzaar.playlists().create()
                 .withTitle("Deletable Playlist")
@@ -223,8 +223,8 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
                 .result()
 
         when:
-        vzaar.recipes().delete(playlist.id)
-        vzaar.recipes().get(playlist.id)
+        vzaar.playlists().delete(playlist.id)
+        vzaar.playlists().get(playlist.id)
 
         then:
         VzaarServerException exception = thrown(VzaarServerException)

@@ -19,6 +19,7 @@ public class Playlist implements Identifiable {
     private ControlsPosition position;
     private boolean autoplay;
     private boolean continuousPlay;
+    private String embedCode;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
@@ -64,6 +65,10 @@ public class Playlist implements Identifiable {
 
     public boolean isContinuousPlay() {
         return continuousPlay;
+    }
+
+    public String getEmbedCode() {
+        return embedCode;
     }
 
     public ZonedDateTime getCreatedAt() {
