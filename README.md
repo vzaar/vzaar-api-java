@@ -23,7 +23,7 @@ in your projects as follows:
 
 ### Gradle/Grails
 ```
-    compile 'com.vzaar:vzaar-java-sdk:2.0.3'
+    compile 'com.vzaar:vzaar-java-sdk:2.0.4'
 ```
 
 ### Apache Maven
@@ -31,13 +31,13 @@ in your projects as follows:
     <dependency>
         <groupId>com.vzaar</groupId>
         <artifactId>vzaar-java-sdk</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.4</version>
     </dependency>
 ```
 
 ### Apache Ivy
 ```
-    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.0.3" />
+    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.0.4" />
 ```
 
 ## Paged Requests
@@ -248,7 +248,7 @@ Once you have checked out the project you can build and test the project with th
     gradlew -DvzaarClientId=<your-client-id> -DvzaarAuthToken=<your-authentication-token> check 
 ```
 
-If you do not have credentials you tell the build to ignore the integration and coverage tests as follows:
+If you do not have credentials you can ignore the integration and coverage tests as follows:
 
 ```
     gradlew check -x integrationTest -x jacocoTestReport

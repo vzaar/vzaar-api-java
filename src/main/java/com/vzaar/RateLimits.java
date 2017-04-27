@@ -59,7 +59,7 @@ public class RateLimits {
      * @return the time in milliseconds
      */
     public long getRateLimitWindowResetInMillis() {
-        return (getRateLimitWindowResetTimestamp() * 1000) - Clock.systemUTC().millis();
+        return Math.max((getRateLimitWindowResetTimestamp() * 1000) - Clock.systemUTC().millis(), 0);
     }
 
     public String getRateLimitWindowResetIn() {
