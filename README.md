@@ -1,188 +1,253 @@
-vzaar API Java client
----
-Lighter and faster vzaar API client for Java developers. Documentation provided below is valid for the library version 2.0 and above.
+# Vzaar Java SDK
 
----
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.vzaar/vzaar-java-sdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.vzaar/vzaar-java-sdk)
+[![Build Status](https://api.travis-ci.org/nine-lives/vzaar-sdk-java.png)](https://travis-ci.org/nine-lives/vzaar-sdk-java)
+[![Code Quality](https://api.codacy.com/project/badge/grade/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
+[![Coverage](https://api.codacy.com/project/badge/coverage/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
 
->vzaar is the go to video hosting platform for business. Affordable, customizable and secure. Leverage the power of online video and enable commerce with vzaar.
+Vzaar Java SDK for Java 8+
 
-----
+## Getting Started
 
-###Using the library
+The vzaar API requires you to have a client ID and authentication token. 
+To manage your API tokens login to https://app.vzaar.com/settings/api.
 
+All API calls are rooted from the `Vzaar` object.
 
-To start, make sure you have included vzaar-java-api.jar into your Project References.
-
-```java
-import com.vzaar.Vzaar;
+```
+    Vzaar vzaar = Vzaar.make(clientId, authToken);
 ```
 
-Now you can create your vzaar client instance:
+The sdk is hosted on maven central so you can include it as a dependency 
+in your projects as follows:
 
-```java
-Vzaar api = new Vzaar("VZAAR_USERNAME", "VZAAR_TOKEN");
+### Gradle/Grails
+```
+    compile 'com.vzaar:vzaar-java-sdk:2.0.4'
 ```
 
-In order to use vzaar API, you need to have a valid user name and API token that you can get from your vzaar dashboard at [http://app.vzaar.com/settings/api](http://app.vzaar.com/settings/api).
+### Apache Maven
+```
+    <dependency>
+        <groupId>com.vzaar</groupId>
+        <artifactId>vzaar-java-sdk</artifactId>
+        <version>2.0.4</version>
+    </dependency>
+```
 
-The very next thing you would want to do is to check if your account actually works and operational and you can do it by simple calling _whoAmI()_:
+### Apache Ivy
+```
+    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.0.4" />
+```
 
-```java
-    Vzaar api = new Vzaar(args[0], args[1]);
-    String whoAmI = api.whoAmI();
-    if (whoAmI.length() != 0) 
-    {
-      System.out.println("WhoAmI - " + whoAmI + "\n");
+## Paged Requests
+
+All requests that return a list of entities extend a `PageableRequest`. It
+allows the request to determine the page size, page number, sort column and
+sort direction. All page request attributes are optional and the server will
+use default values if they are not set. Page counting starts from 1.
+
+The sort column, if available for sorting, is the attribute name in snake case. For example:
+
+```
+    Page<Video> page = vzaar.videos().list()
+            .withPage(1)
+            .withResultsPerPage(5)
+            .withSortByAttribute("created_at")
+            .withSortDirection(SortDirection.desc)
+            .results();
+```
+
+Paged requests return typed `Page` responses, which are able to request the first,
+next, previous pages.
+
+```
+    Page<Video> page = vzaar.videos().list().results();
+    System.out.println("Total count = " + page.getTotalCount());
+    System.out.println("Page count = " + page.getData().size());
+    
+    if (page.hasNext()) {
+        Page<Video> nextPage = page.getNext();
+        
+        // This is equivalent for a default search to 
+        nextPage = vzaar.videos().list().withPage(2).results();
     }
-    else
-    {
-      System.out.println("Error\n");
+```
+
+There is also a utility class called `Pages` to allow you to retrieve
+all the items on a given page and subsequent pages as a single list or 
+stream.
+
+```
+    // Collate all videos irrelevant of the number of pages 
+    List<Video> videos = Pages.list(vzaar.videos().list().results());
+    
+    // An iterator that will return all the videos irrelevant
+    // of the number of pages. Note that this calls subsequent pages
+    // lazily so may be preferable to Pages.list if memory is an issue or 
+    // there are early exit conditions from a loop
+    Iterator<Video> videos = Pages.iterator(vzaar.videos().list().results());
+    while(videos.hasNext()) {
+        Video video = videos.next();
+    }
+    
+    // An iterable wrapper around the iterator
+    for (Video video : Pages.iterable(vzaar.videos().list().results()) {
     }
 ```
 
-If it returns you your vzaar username, - we are good to go.
-
-####User Details
-
->This API call returns the user's public details along with it's relevant metadata. It also contains vzaar Account ID that you can use in _api.getAccountDetails_ call.
-
-```java
-UserDetails details = api.getUserDetails(VZAAR_USERNAME);
+## Video Uploading
+ 
+There are two simple ways to upload videos to Vzaar. The first is from
+a local file.
+ 
+```
+    File videoFile = new File("myvideo.mp4");
+    Video video = vzaar.videos().uploadWithFile()
+          .withTitle("My video title")
+          .withUploader("Jack Smith")
+          .withFile(videoFile)
+          .result();
 ```
 
-Where _VZAAR_USERNAME_ is the vzaar username. Result of this call will be an object of UserDetails type.
+Note that this method will automatically decide whether the file should
+be uploaded as a single upload or a multipart upload. The current default 
+boundary is set to 1GB, that is if the file is larger than 1GB then it
+will be sent in 128MB chunks.
 
-####Account Details
+If you want to configure the boundary for determining when the video
+should be sent as a multipart upload or the default chunk size this can
+be done using the `RestClientConfiguration` and initialising the Vzaar
+object with it.
 
->This API call returns the details and rights for each vzaar subscription account type along with it's relevant metadata. This will show the details of the packages available here: [http://vzaar.com/pricing](http://vzaar.com/pricing)
-
-```java
-AccountDetails details = api.getAccountDetails(VZAAR_ACCOUNT_ID);
+```
+    Vzaar vzaar = Vzaar.make(new RestClientConfiguration()
+        .withClientId(clientId)
+        .withAuthToken(authToken)
+        .withUseMultipartWhenFileSizeInMbOver(128)
+        .withDefaultDesiredChunkSizeInMb(64));
 ```
 
-Where _VZAAR_ACCOUNT_ID_ is the unique account id assigned by vzaar.
+You can also upload your video from a URL.
 
-Result of this call will be an object of AccountDetails type.
-
-####Video List
-
->This API call returns a list of the user's active videos along with it's relevant metadata. 20 videos are returned by default but this is customizable.
-
-```java
-VideoListQuery query = new VideoListQuery;
-query.count = 10;
-query.page = 1;
-List<Video> list = api.getVideoList(query);
+```
+    Video video = vzaar.videos().uploadWithLink()
+        .withTitle("My video title")
+        .withUploader("Jack Smith")
+        .withUrl("https://www.example.com/my-video.com")
+        .result();
 ```
 
-####Video Details
+If you need more control over your uploads you can call the `CustomUploader`
+which will give you finer control over your uploads.
 
->This API call returns metadata about selected video, like its dimensions, thumbnail information, author, duration, play count and so on.
+```
+    File videoFile = new File("myvideo.mp4");
 
-```java
-api.getVideoDetails(VZAAR_VIDEO_ID);
+    CustomUploader uploader = vzaar.videos().getCustomUploader();
+
+    // Create the upload signature
+    Signature signature = uploader.signature()
+            .withType(UploadType.multipart)
+            .withFile(videoFile)
+            .withUploader("Jack Smith")
+            .withDesiredPartSizeInMb(64)
+            .result();
+
+    // Do one of a or b below
+    // a) This will upload all the chunks sequentially before returning
+    uploader.upload(signature, videoFile);
+    
+    // b) Alternatively you could call the uploading of chunks separately
+    for (int i = 0; i < signature.getParts(); ++i) {
+        uploader.uploadPart(signature, videoFile, i);
+    }
+
+    // Finally tell Vzaar that the video is uploaded
+    Video video = uploader.createVideo()
+            .withGuid(signature.getGuid())
+            .withTitle("My Video Title")
+            .result();
+    
+
 ```
 
-Where _VZAAR_VIDEO_ID_ is unique vzaar video ID assigned to a video after its processing.
+## Utility Classes
 
-####Upload Signature
+There is an `Identifiables` class that allows you to collect ids, check if 
+an id exists, find a domain entity by id or index the objects by id.
 
->In some cases you might need to not perform actual uploading from API but to use some third-party uploaders, like S3_Upload widget, or any other, so you would need to get only upload signature for it, so now you can have it as UploadSignature object, as XML string, as XmlDocument or as JSON string.
+```
+    List<EncodingPreset> presets = Page.list(vzaar.encodingPresets().list().results());
 
-```java
-UploadSignature signature = null;
-UploadSignatureQuery query = new UploadSignatureQuery();
-
-query.path =  URLEncoder.encode("/path/to/file/video.mp4", "UTF-8");
-query.filename = URLEncoder.encode("video.mp4", "UTF-8");
-query.fileSize = 465756543;
-query.multipart = true;
-
-signature = api.getUploadSignature(query);
-
-System.out.println("Upload Signature - " + signature.toString());
+    // Collect the ids
+    Set<Integer> presetIds = Identifiables.collect(presets);
+     
+    // Check if an id exists
+    boolean exists = Identifiables.hasId(presets, 42);
+         
+    // Get the entity by id
+    EncodingPreset preset = Identifiables.find(presets, 42);
+         
+    // Map by id
+    Map<Integer, EncodingPreset> idMap = Identifiables.index(presets);     
 ```
 
-UploadSignatureQuery has the following parameters:
+To build out the category tree structure you can use the `CategoryTreeBuilder` utility
+class. By default the children, including the root nodes are sorted by the category
+name. You can change the sort order by passing in your own comparator.
 
-- _redirectUrl_ - post upload redirection URL
-- _multipart_ - true|false, enables or disables multipart upload support
-- _path_ - local path of the video file to be uploaded
-- _url_ - remote path of the video file to be uploaded
-- _filename_ - basename of file being uploaded
-- _filesize_ - size in bytes of file being uploaded
-
-In _UploadSignatureQuery_ path or url are parameters mandatory, if either of them used it will throw an error. _url_ parameter used to upload from URL and _path_ to upload from the local storage.
-
-Both _filesize_ and _filename_ are mandatory in order to initiate the c orrect S3 multipart upload, although no exception will be raised from the API if either is missing. In the case of either of these parameters being missing, no errors will be raised but video processing will be significantly slower, especially for large files.
-
-####Uploading video
-
->Upload video from local drive directly to Amazon S3 bucket. Use this method when you build desktop apps or when you upload videos to vzaar directly from your server.
-
-```java
-String guid = api.uploadVideo("PATH/TO/SOME_FILE");
+```
+    List<Category> categories = Page.list(vzaar.categories().list().results());
+    
+    // Build the tree, this returns all the root categories, 
+    // i.e. those without a parent id
+    List<CategoryNode> treeRoots = CategoryTreeBuilder.build(categories);
+    
+    CategoryNode firstRootNode = treeRoots.get(0);
+    firstRootNode.getCategory();         // the category
+    firstRootNode.hasChildren();         // are there any children?
+    firstRootNode.getChildCount();       // the total count of direct children
+    firstRootNode.getDescendantCount();  // the total count of all decendants
+    firstRootNode.getChildren();         // get the direct children nodes 
+    
 ```
 
-Keep in mind that file uploaded to a Amazon S3 storage in chunks of 128Kb, you can adjust this chunk size this way:
+## Custom Configuration
 
-```java
-api.bufferSize = 262144; //256 kb
+You can also use `RestClientConfiguration` to configure the SDK. Apart
+from the the client id and auth token all the other values have defaults.
+
+```
+    Vzaar vzaar = Vzaar.make(new RestClientConfiguration()
+        .withClientId(clientId)
+        .withAuthToken(authToken)
+        .withEndpoint("https://api.vzaar.com/api/v2")
+        .withMaxConnectionsPerRoute(20)
+        .withUserAgent("vzaar-sdk-java 2.0.0")
+        .withBlockTillRateLimitReset(false)
+        .withUseMultipartWhenFileSizeInMbOver(1024)
+        .withDefaultDesiredChunkSizeInMb(128));
 ```
 
-####Processing video
+| Configuration Attribute | Description |
+| ----------------------- | ----------- |
+| Endpoint | The base api url. Defaults to https://api.vzaar.com/api/v2 |
+| MaxConnectionsPerRoute | The effective maximum number of concurrent connections in the pool. Connections try to make use of the keep-alive directive. Defaults to 20
+| UserAgent | The user agent string sent in the request
+| BlockTillRateLimitReset | If set to true then the client will block if the rate limit has been reached until the reset timestamp has expired. Defaults to false
+| UseMultipartWhenFileSizeInMbOver | The boundary condition of file size to determine when multipart upload should be used. Defaults to 1024MB
+| DefaultDesiredChunkSizeInMb | The default desired chunk size for multipart uploads when upload type auto-selection is being used. Defaults to 128MB 
 
->This API call tells the vzaar system to process a newly uploaded video. This will encode it if necessary and then provide a vzaar video ID back.
 
-```java
-VideoProcessQuery processQuery = new VideoProcessQuery();
-processQuery.guid = "vzcf7af7bc5a734c30a46ca3911e7f3458";
-processQuery.title = "My awesome video";
-processQuery.description = "The story about how easy to build awesome apps with vzaar API";
-processQuery.profile = VideoProfile.ORIGINAL;
-processQuery.labels = new String[]{"api", "tutorials"};
+## Build
 
-int x = api.processVideo(processQuery);
+Once you have checked out the project you can build and test the project with the following command:
+
+```
+    gradlew check -x integrationTest -x jacocoTestReport
 ```
 
-If you want to replace existing video with some newly uploaded, you can call _Process Video_ with adding _replaceId_ parameter equal to vzaar video ID of the video that needs to be replaced.
+ 
+ 
 
-```java
-VideoProcessQuery processQuery = new VideoProcessQuery();
-processQuery.guid = "vzcf7af7bc5a734c30a46ca3911e7f3458";
-processQuery.replaceId = 12345678; //vzaar Video ID of the video you want to replace
-processQuery.title = "My awesome video";
-processQuery.description = "The story about how easy to build awesome apps with vzaar API";
-processQuery.profile = VideoProfile.ORIGINAL;
-processQuery.labels = new String[]{"api", "tutorials"};
-
-int x = api.processVideo(processQuery);
-```
-
-####Editing video
-
->This API call allows a user to edit or change details about a video in the system.
-
-```java
-VideoEditQuery editQuery = new VideoEditQuery();
-editQuery.title = "My REALLY awesome video";
-editQuery.description = "The story about how easy to build awesome apps with vzaar API";
-editQuery.markAsPrivate = true;
-
-Boolean x = api.editVideo(editQuery);
-```
-
-Notice _markAsPrivate_ property in _VideoEditQuery_ variable, you can pass there _true_ or _false_, and this property marks the video as private (if true) or public (if false).
-
-####Deleting video
->This API call allows you to delete a video from your account. If deletion was successful it will return you _true_ otherwise _false_.
-
-```java
-Boolean result = api.deleteVideo(VZAAR_VIDEO_ID);
-```
-
-Where VZAAR_VIDEO_ID is unique vzaar video ID assigned to a video after its processing.
-
-### License
-
-Released under the [MIT License](http://www.opensource.org/licenses/MIT).
