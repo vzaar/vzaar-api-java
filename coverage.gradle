@@ -13,6 +13,8 @@ ext {
     ]
 }
 
+test.finalizedBy jacocoTestReport
+
 jacocoTestReport {
     reports {
         //XML required by coveralls and for the below coverage checks

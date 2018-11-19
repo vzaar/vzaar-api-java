@@ -28,6 +28,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -120,7 +122,23 @@ public class RestClient {
         }
     }
 
+    <T> Resource<T> postUpload(Resource<T> resource, Map<String, Object> payload) {
+        try {
+            return execute(resource, setPayload(new HttpPost(resource.getUri()), payload));
+        } catch (IOException | URISyntaxException e) {
+            throw new VzaarException(e);
+        }
+    }
+
     <T> Resource<T> patch(Resource<T> resource, Object payload) {
+        try {
+            return execute(resource, setPayload(new HttpPatch(resource.getUri()), payload));
+        } catch (IOException | URISyntaxException e) {
+            throw new VzaarException(e);
+        }
+    }
+
+    <T> Resource<T> patchUpload(Resource<T> resource, Map<String, Object> payload) {
         try {
             return execute(resource, setPayload(new HttpPatch(resource.getUri()), payload));
         } catch (IOException | URISyntaxException e) {
@@ -174,6 +192,21 @@ public class RestClient {
         StringEntity entity = new StringEntity(objectMapper.writeValueAsString(payload));
         entity.setContentType("application/json");
         request.setEntity(entity);
+        return request;
+    }
+
+    private <T extends HttpEntityEnclosingRequest> T setPayload(T request, Map<String, Object> payload) throws IOException {
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        for (Map.Entry<String, Object> entry : payload.entrySet()) {
+            if (entry.getValue() instanceof File) {
+                File file = (File) entry.getValue();
+                ContentBody body = new FileStreamingBody(new FileInputStream(file), file.getName(), file.length());
+                builder.addPart(entry.getKey(), body);
+            } else {
+                builder.addTextBody(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+        }
+        request.setEntity(builder.build());
         return request;
     }
 

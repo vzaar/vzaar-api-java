@@ -3,6 +3,10 @@ package com.vzaar;
 import com.vzaar.client.Resource;
 import com.vzaar.client.RestClient;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 public class VideoResource {
     private final RestClient client;
 
@@ -42,6 +46,29 @@ public class VideoResource {
      */
     public void delete(int videoId) {
         id(videoId).delete();
+    }
+
+    /**
+     * Set the still image for the video from a video frame
+     * @param videoId the id of a video
+     * @param time seconds into video to generate poster frame from
+     */
+    public Video updateImageFrame(int videoId, double time) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("time", time);
+        return id(videoId).action("image").update(payload);
+    }
+
+    /**
+     * Set the still image for the video from a video frame
+     * @param videoId the id of a video
+     * @param file seconds into video to generate poster frame from
+     */
+    public Video uploadImageFrame(int videoId, File file, boolean optimize) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("optimize", optimize);
+        payload.put("image", file);
+        return id(videoId).action("image").createWithUpload(payload);
     }
 
     /**
