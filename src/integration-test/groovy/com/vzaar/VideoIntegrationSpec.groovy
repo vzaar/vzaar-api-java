@@ -1,8 +1,9 @@
 package com.vzaar
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import spock.lang.Unroll
 
-public class VideoIntegrationSpec extends BaseIntegrationSpec {
+class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def setup() {
         // Wait for list stability
@@ -168,6 +169,8 @@ public class VideoIntegrationSpec extends BaseIntegrationSpec {
             try {
                 sleep(10000)
                 waitForVideo = vzaar.videos().get(video.id)
+            } catch(UnrecognizedPropertyException e) {
+                throw e
             } catch (Exception ignore) {
             }
         }
