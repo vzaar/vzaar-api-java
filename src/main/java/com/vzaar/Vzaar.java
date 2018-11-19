@@ -94,4 +94,11 @@ public final class Vzaar {
         return new PlaylistResource(client);
     }
 
+    /**
+     * Get the subtitles resource to list and fetch subtitles.
+     * @return a subtitles resource
+     */
+    public SubtitleResource subtitles() {
+        return new SubtitleResource(client);
+    }
 }

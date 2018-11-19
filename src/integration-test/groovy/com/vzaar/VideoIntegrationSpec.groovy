@@ -123,10 +123,10 @@ class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can search for a video by title"() {
         given:
-        Page<Video> allVideosPage = vzaar.videos().list().results()
+        Page<Video> allVideosPage = vzaar.videos().list().withSortByAttribute("title").results()
 
         when:
-        Page<Video> searchVideosPage = vzaar.videos().list().withEscapedQuery(allVideosPage.data[0].title).results()
+        Page<Video> searchVideosPage = vzaar.videos().list().withSortByAttribute("title").withEscapedQuery(allVideosPage.data[0].title).results()
 
         then:
         searchVideosPage.totalCount == 1
@@ -225,5 +225,54 @@ class VideoIntegrationSpec extends BaseIntegrationSpec {
         video.id
         video.description == 'Link video description'
         video.title == 'Link video'
+
+        cleanup:
+        if (video) {
+            vzaar.videos().delete(video.id)
+        }
     }
+
+    def "I can update the image frame for a video"() {
+        given:
+        Video video = vzaar.videos().uploadWithLink()
+                .withUrl("https://github.com/nine-lives/vzaar-sdk-java/raw/master/src/integration-test/resources/videos/small.mp4")
+                .withUploader("integration-test")
+                .withDescription("Link video description")
+                .withTitle("Link video")
+                .result()
+
+        when:
+        video = vzaar.videos().updateImageFrame(video.id, 1.5)
+
+        then:
+        video.id
+
+        cleanup:
+        if (video) {
+            vzaar.videos().delete(video.id)
+        }
+    }
+
+    def "I can upload an image frame for a video"() {
+        given:
+        Video video = vzaar.videos().uploadWithLink()
+                .withUrl("https://github.com/nine-lives/vzaar-sdk-java/raw/master/src/integration-test/resources/videos/small.mp4")
+                .withUploader("integration-test")
+                .withDescription("Link video description")
+                .withTitle("Link video")
+                .result()
+
+        when:
+        File file = new File(getClass().classLoader.getResource("videos/logo-430x150-bw.png").getFile())
+        video = vzaar.videos().uploadImageFrame(video.id, file, false)
+
+        then:
+        video.id
+
+        cleanup:
+        if (video) {
+            vzaar.videos().delete(video.id)
+        }
+    }
+
 }

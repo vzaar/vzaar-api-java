@@ -55,4 +55,23 @@ class SignatureSpec extends Specification {
             parts == 4
         }
     }
+
+    def "I can delegate the SignatureRequest fields"() {
+        given:
+        Signature signature = new Signature();
+        SignatureRequest request = new SignatureRequest()
+            .withFilename("filename.mp4")
+            .withFilesize(12345)
+            .withUploader("uploader")
+            .withUploadType(UploadType.single)
+
+        when:
+        signature.withSignatureRequest(request)
+
+        then:
+        signature.filename == 'filename.mp4'
+        signature.filesize == 12345
+        signature.uploader == 'uploader'
+        signature.type == UploadType.single
+    }
 }

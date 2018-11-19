@@ -31,7 +31,7 @@ public class Video implements Identifiable {
     private List<Advert> adverts;
     private List<Rendition> renditions;
     private List<LegacyRendition> legacyRenditions;
-    private List<Video> subtitles;
+    private List<Subtitle> subtitles;
 
     public int getId() {
         return id;
@@ -121,7 +121,7 @@ public class Video implements Identifiable {
         return adverts;
     }
 
-    public List<Video> getSubtitles() {
+    public List<Subtitle> getSubtitles() {
         return subtitles;
     }
 }

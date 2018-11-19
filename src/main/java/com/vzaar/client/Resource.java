@@ -8,6 +8,8 @@ import com.vzaar.VzaarException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Resource<T> {
@@ -54,6 +56,11 @@ public class Resource<T> {
         return this;
     }
 
+    public List<T> list() {
+        client.get(this);
+        return getPage().getData();
+    }
+
     public T lookup() {
         Objects.requireNonNull(id, "resource id has not been set");
         client.get(this);
@@ -67,6 +74,16 @@ public class Resource<T> {
 
     public T update(Object request) {
         client.patch(this, request);
+        return getData();
+    }
+
+    public T createWithUpload(Map<String, Object> request) {
+        client.postUpload(this, request);
+        return getData();
+    }
+
+    public T updateWithUpload(Map<String, Object> request) {
+        client.patchUpload(this, request);
         return getData();
     }
 
