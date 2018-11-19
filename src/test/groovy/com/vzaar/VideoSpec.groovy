@@ -24,7 +24,9 @@ class VideoSpec extends Specification {
                 "id": 7574853,
                 "title": "multipart",
                 "user_id": 42,
+                "user_login": "my-login",
                 "account_id": 1,
+                "account_name": "my-account",
                 "description": "My video",
                 "duration": 66.7,
                 "created_at": "2016-11-11T11:36:26.000Z",
@@ -33,11 +35,14 @@ class VideoSpec extends Specification {
                 "seo_url": "http://example.com/video.mp4",
                 "url": "http://example.com/video1.mp4",
                 "state": "ready",
+                "asset_url": "https://view.vzaar.com/123/video",
+                "poster_url": "https://view.vzaar.com/123/image",
                 "thumbnail_url": "https://view.vzaar.com/7574853/thumb",
                 "embed_code": "<iframe id=\\"vzvd-7574853\\" name=\\"vzvd-7574853\\" title=\\"video player\\" class=\\"video-player\\" type=\\"text/html\\" width=\\"448\\" height=\\"278\\" frameborder=\\"0\\" allowfullscreen allowTransparency=\\"true\\" mozallowfullscreen webkitAllowFullScreen src=\\"//view.vzaar.com/7574853/player\\"></iframe>",
                 "renditions": [
                   {
                     "id": 66,
+                    "code": "magic",
                     "width": 416,
                     "height": 258,
                     "bitrate": 200,
@@ -68,7 +73,9 @@ class VideoSpec extends Specification {
             id == 7574853
             title == 'multipart'
             userId == 42
+            userLogin == 'my-login'
             accountId == 1
+            accountName == 'my-account'
             description == 'My video'
             duration == 66.7 as Double
             createdAt.isEqual(ZonedDateTime.parse("2016-11-11T11:36:26.000Z"))
@@ -77,6 +84,8 @@ class VideoSpec extends Specification {
             seoUrl == 'http://example.com/video.mp4'
             url == 'http://example.com/video1.mp4'
             state == VideoState.ready
+            assetUrl == 'https://view.vzaar.com/123/video'
+            posterUrl == 'https://view.vzaar.com/123/image'
             thumbnailUrl == 'https://view.vzaar.com/7574853/thumb'
             embedCode == '<iframe id="vzvd-7574853" name="vzvd-7574853" title="video player" class="video-player" type="text/html" width="448" height="278" frameborder="0" allowfullscreen allowTransparency="true" mozallowfullscreen webkitAllowFullScreen src="//view.vzaar.com/7574853/player"></iframe>'
             renditions.size() == 1
@@ -84,6 +93,7 @@ class VideoSpec extends Specification {
         }
         with(entity.data.renditions[0]) {
             id == 66
+            code == 'magic'
             width == 416
             height == 258
             bitrate == 200
