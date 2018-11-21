@@ -24,13 +24,15 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
         signature.filename == 'my_video.mp4'
         signature.filesize == NOT_QUITE_5GB
         signature.uploader == 'vzaar-java-sdk 1.0'
-        signature.accessKeyId ==~ /[A-Z0-9]{20,}/
+        signature.credential ==~ /.*\/\d{8}\/.*\/s3\/aws4_request/
+        signature.algorithm == 'AWS4-HMAC-SHA256'
+        signature.date ==~ /\d{8}T\d{6}Z/
+        signature.signature ==~ /[A-z0-9+\/]{24,}={0,2}$/
         signature.key ==~ /vzaar\/.+\/\$\{filename\}/
         signature.acl == 'private'
-        signature.policy ==~ /[A-z0-9+]{128,}=?$/
-        signature.signature ==~ /[A-z0-9+\/]{24,}=?$/
+        signature.policy ==~ /[A-z0-9+]{128,}={0,2}$/
         signature.successActionStatus == '201'
-        signature.contentType == 'binary/octet-stream'
+        //signature.contentType == 'binary/octet-stream'
         signature.guid ==~ /[A-z0-9_-]{8,}/
         signature.bucket ==~ /vzaar-upload.*/
         signature.uploadHostname ==~ /https:\/\/vzaar-upload.*\.s3\.amazonaws\.com/
@@ -67,13 +69,15 @@ class CreateSignatureIntegrationSpec extends BaseIntegrationSpec {
                 .result()
 
         then:
-        signature.accessKeyId ==~ /[A-Z0-9]{20,}/
         signature.key ==~ /vzaar\/.+\/\$\{filename\}/
         signature.acl == 'private'
-        signature.policy ==~ /[A-z0-9+]{128,}=?$/
-        signature.signature ==~ /[A-z0-9+\/]{24,}=?$/
+        signature.policy ==~ /[A-z0-9+]{128,}={0,2}$/
+        signature.credential ==~ /.*\/\d{8}\/.*\/s3\/aws4_request/
+        signature.algorithm == 'AWS4-HMAC-SHA256'
+        signature.date ==~ /\d{8}T\d{6}Z/
+        signature.signature ==~ /[A-z0-9+\/]{24,}={0,2}$/
         signature.successActionStatus == '201'
-        signature.contentType == 'binary/octet-stream'
+        //signature.contentType == 'binary/octet-stream'
         signature.guid ==~ /[A-z0-9_-]{8,}/
         signature.bucket ==~ /vzaar-upload.*/
         signature.uploadHostname ==~ /https:\/\/vzaar-upload.*\.s3\.amazonaws\.com/

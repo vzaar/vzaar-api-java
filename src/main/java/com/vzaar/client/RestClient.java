@@ -68,30 +68,32 @@ public class RestClient {
         return new Resource<>(this, type);
     }
 
-    public String s3(InputStream in, Signature signature, int part) throws IOException {
+    public void s3(InputStream in, Signature signature, int part) throws IOException {
         HttpPost request = new HttpPost(signature.getUploadHostname());
         String fileSuffix = signature.getType() == UploadType.multipart ? "." + part : "";
         ContentBody body = new FileStreamingBody(in, signature.getFilename(), signature.getType() == UploadType.multipart
                 ? signature.getPartSizeInBytes()
                 : signature.getFilesize());
+
         request.addHeader("User-agent", configuration.getUserAgent());
-        request.addHeader("x-amz-acl", signature.getAcl());
-        request.addHeader("Enclosure-Type", "multipart/form-data");
         request.setEntity(MultipartEntityBuilder.create()
-                .addTextBody("AWSAccessKeyId", signature.getAccessKeyId())
-                .addTextBody("Signature", signature.getSignature())
                 .addTextBody("acl", signature.getAcl())
                 .addTextBody("bucket", signature.getBucket())
                 .addTextBody("policy", signature.getPolicy())
                 .addTextBody("success_action_status", signature.getSuccessActionStatus())
-                .addTextBody("x-amz-meta-uploader", signature.getUploader())
                 .addTextBody("key", signature.getKey() + fileSuffix)
+                .addTextBody("x-amz-meta-uploader", signature.getUploader())
+                .addTextBody("x-amz-credential", signature.getCredential())
+                .addTextBody("x-amz-algorithm", signature.getAlgorithm())
+                .addTextBody("x-amz-date", signature.getDate())
+                .addTextBody("x-amz-signature", signature.getSignature())
                 .addPart("file", body)
                 .build());
-
         HttpResponse response = httpClient.execute(request);
+        if (response.getStatusLine().getStatusCode() >= 202) {
+            throw new VzaarException(EntityUtils.toString(response.getEntity()));
+        }
         EntityUtils.consume(response.getEntity());
-        return signature.getGuid();
     }
 
     String getEndpoint() {

@@ -1,18 +1,24 @@
 package com.vzaar;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vzaar.client.ResourcePath;
 
 @ResourcePath(path = "signature")
 public class Signature {
     private transient SignatureRequest request;
+    @JsonProperty("x-amz-credential")
+    private String xAmzCredential;
+    @JsonProperty("x-amz-algorithm")
+    private String xAmzAlgorithm;
+    @JsonProperty("x-amz-date")
+    private String xAmzDate;
+    @JsonProperty("x-amz-signature")
+    private String xAmzSignature;
 
-    private String accessKeyId;
     private String key;
     private String acl;
     private String policy;
-    private String signature;
     private String successActionStatus;
-    private String contentType;
     private String guid;
     private String bucket;
     private String uploadHostname;
@@ -20,8 +26,21 @@ public class Signature {
     private long partSizeInBytes;
     private int parts;
 
-    public String getAccessKeyId() {
-        return accessKeyId;
+
+    public String getCredential() {
+        return xAmzCredential;
+    }
+
+    public String getAlgorithm() {
+        return xAmzAlgorithm;
+    }
+
+    public String getDate() {
+        return xAmzDate;
+    }
+
+    public String getSignature() {
+        return xAmzSignature;
     }
 
     public String getKey() {
@@ -36,16 +55,8 @@ public class Signature {
         return policy;
     }
 
-    public String getSignature() {
-        return signature;
-    }
-
     public String getSuccessActionStatus() {
         return successActionStatus;
-    }
-
-    public String getContentType() {
-        return contentType;
     }
 
     public String getGuid() {

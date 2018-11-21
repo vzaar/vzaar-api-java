@@ -1,6 +1,6 @@
 package com.vzaar;
 
-public class S3UploadSinglepartIntegrationSpec extends BaseIntegrationSpec {
+class S3UploadSinglepartIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can upload a video in a single part"() {
         given:
@@ -10,6 +10,8 @@ public class S3UploadSinglepartIntegrationSpec extends BaseIntegrationSpec {
                 .withUploader("java-integration-test")
                 .withFilesize(smallVideo.size())
                 .result()
+
+        println (signature.filesize)
 
         when:
         vzaar.videos().customUploader.upload(signature, smallVideo);

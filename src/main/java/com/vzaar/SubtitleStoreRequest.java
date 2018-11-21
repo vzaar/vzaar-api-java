@@ -1,5 +1,7 @@
 package com.vzaar;
 
+import com.vzaar.subtitles.SubRipSubtitles;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,11 +53,11 @@ public class SubtitleStoreRequest<T> {
      * The subtitle content. You must provide one (but not both) of file or content. Content
      * newlines must be represented with \n to be valid JSON.
      *
-     * @param content the content in SRT or VTT format
+     * @param content the content
      * @return this
      */
-    public T withContent(String content) {
-        this.content = content;
+    public T withContent(SubRipSubtitles content) {
+        this.content = content.toString();
         return type.cast(this);
     }
 
