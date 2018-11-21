@@ -1,5 +1,7 @@
 package com.vzaar
 
+import com.vzaar.subtitles.SubRipSubtitles
+
 class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
 
     def setup() {
@@ -38,7 +40,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         Subtitle subtitleEn = vzaar.subtitles().create(video.getId())
             .withCode("en")
             //.withTitle("Subtitles EN")
-            .withContent("1\n00:00:00,498 --> 00:00:02,827\nMy Subtitles\n\n")
+            .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
             .result()
 
         then:
@@ -54,7 +56,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         Subtitle subtitleFr = vzaar.subtitles().create(video.getId())
                 .withCode("fr")
 //                .withTitle("Subtitles FR")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMes Subtitres\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -142,7 +144,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEn = vzaar.subtitles().create(video.getId())
                 .withCode("en")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMy Subtitles\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -157,7 +159,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         vzaar.subtitles().create(video.getId())
                 .withCode("en")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMes Subtitres\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -185,7 +187,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEn = vzaar.subtitles().create(video.getId())
                 .withCode("en")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMy Subtitles\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -200,7 +202,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEnUpdated = vzaar.subtitles().update(video.getId(), subtitleEn.id)
                 .withCode("fr")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMes Subtitres\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -240,7 +242,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEn = vzaar.subtitles().create(video.getId())
                 .withCode("en")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMy Subtitles\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -295,7 +297,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEn = vzaar.subtitles().create(video.getId())
                 .withCode("en")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMy Subtitles\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -310,7 +312,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleFr = vzaar.subtitles().create(video.getId())
                 .withCode("fr")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMes Subtitres\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -325,7 +327,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEnUpdated = vzaar.subtitles().update(video.getId(), subtitleEn.id)
                 .withCode("fr")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMes Subtitres\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         then:
@@ -360,7 +362,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
                 .result()
         Subtitle subtitle = vzaar.subtitles().create(video.getId())
                 .withCode("en")
-                .withContent("1\n00:00:00,498 --> 00:00:02,827\nMy Subtitles\n\n")
+                .withContent(new SubRipSubtitles().addCue("00:00:00,498", "00:00:02,827", "My Subtitles"))
                 .result()
 
         when:

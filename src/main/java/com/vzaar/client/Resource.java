@@ -42,13 +42,11 @@ public class Resource<T> {
 
     public Page<T> page(Object params) {
         this.params = params;
-        client.get(this);
-        return getPage();
+        return client.get(this).getPage();
     }
 
     public Page<T> pageWithUrl(String url) {
-        client.get(this, url);
-        return getPage();
+        return client.get(this, url).getPage();
     }
 
     public Resource<T> path(String path) {
@@ -57,34 +55,28 @@ public class Resource<T> {
     }
 
     public List<T> list() {
-        client.get(this);
-        return getPage().getData();
+        return client.get(this).getPage().getData();
     }
 
     public T lookup() {
         Objects.requireNonNull(id, "resource id has not been set");
-        client.get(this);
-        return getData();
+        return client.get(this).getData();
     }
 
     public T create(Object request) {
-        client.post(this, request);
-        return getData();
+        return client.post(this, request).getData();
     }
 
     public T update(Object request) {
-        client.patch(this, request);
-        return getData();
+        return client.patch(this, request).getData();
     }
 
     public T createWithUpload(Map<String, Object> request) {
-        client.postUpload(this, request);
-        return getData();
+        return client.postUpload(this, request).getData();
     }
 
     public T updateWithUpload(Map<String, Object> request) {
-        client.patchUpload(this, request);
-        return getData();
+        return client.patchUpload(this, request).getData();
     }
 
     public void delete() {

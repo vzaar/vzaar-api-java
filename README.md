@@ -172,6 +172,33 @@ which will give you finer control over your uploads.
 
 ```
 
+## Adding Subtitles
+
+You can add subtitles as follows:
+
+```$java
+    vzaar.subtitles().create(video.getId())
+        .withCode("en")
+        .withContent(new SubRipSubtitles()
+            .addCue("00:00:01,123", "00:00:11,321", "First subtitle")
+            .addCue("00:01:02,123", "00:01:12,321", "Second subtitle")
+            .addCue("01:02:03,123", "02:01:13,321", "Third subtitle")
+        .result()
+```
+
+You may also use millisecond offsets from the start of the 
+video rather than the string representation above.
+
+```$java
+    vzaar.subtitles().create(video.getId())
+        .withCode("en")
+        .withContent(new SubRipSubtitles()
+            .addCue(1123, 11321, "First subtitle")
+            .addCue(62123, 72321, "Second subtitle")
+            .addCue(3723123, 7273321, "Third subtitle")
+        .result()
+```
+
 ## Utility Classes
 
 There is an `Identifiables` class that allows you to collect ids, check if 
