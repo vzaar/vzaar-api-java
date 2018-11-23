@@ -1,6 +1,7 @@
 # Vzaar Java SDK
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.vzaar/vzaar-java-sdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.vzaar/vzaar-java-sdk)
+[![Javadocs](http://javadoc.io/badge/com.vzaar/vzaar-sdk-java.svg)](http://javadoc.io/doc/com.vzaar/vzaar-sdk-java)
 [![Build Status](https://api.travis-ci.org/nine-lives/vzaar-sdk-java.png)](https://travis-ci.org/nine-lives/vzaar-sdk-java)
 [![Code Quality](https://api.codacy.com/project/badge/grade/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
 [![Coverage](https://api.codacy.com/project/badge/coverage/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
