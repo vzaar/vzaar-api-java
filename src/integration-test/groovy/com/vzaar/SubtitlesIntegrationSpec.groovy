@@ -104,7 +104,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         when:
         Subtitle subtitleEn = vzaar.subtitles().create(video.getId())
                 .withCode("en")
-        //.withTitle("Subtitles EN")
+                //.withTitle("Subtitles EN")
                 .withFile(new File(getClass().classLoader.getResource("videos/subtitles.srt").getFile()))
                 .result()
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vzaar.client.ResourcePath;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class IngestRecipe implements Identifiable  {
     private boolean sendToYoutube;
     private boolean notifyByEmail;
     private boolean notifyByPingback;
-    private List<EncodingPreset> encodingPresets;
+    private List<EncodingPreset> encodingPresets = new ArrayList<>();
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 

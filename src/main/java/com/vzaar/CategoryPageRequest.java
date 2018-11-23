@@ -2,12 +2,13 @@ package com.vzaar;
 
 import com.vzaar.client.Resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryPageRequest extends PageableRequest<CategoryPageRequest, Category> {
 
     private Integer levels;
-    private List<Integer> ids;
+    private List<Integer> ids = new ArrayList<>();
 
     private CategoryPageRequest() {
         this(null);

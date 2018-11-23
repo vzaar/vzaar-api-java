@@ -33,12 +33,12 @@ Third subtitle
         String output = new SubRipSubtitles()
                 .addCue("00:01:02,123", "00:01:12,321", "Second subtitle")
                 .addCue("01:02:03,123", "02:01:13,321", "Third subtitle")
-                .addCue("00:00:01,123", "00:00:11,321", "First subtitle")
+                .addCue("00:00:01,123", "00:00:11", "First subtitle")
                 .toString()
 
         then:
         output == '''1
-00:00:01,123 --> 00:00:11,321
+00:00:01,123 --> 00:00:11,000
 First subtitle
 
 2
