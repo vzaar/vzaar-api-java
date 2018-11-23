@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class SubRipCue implements Comparable<SubRipCue> {
 
-    private static final Pattern TIME_PATTERN = Pattern.compile("(\\d{2}):([0-5]\\d):([0-5]\\d),(\\d{3})");
+    private static final Pattern TIME_PATTERN = Pattern.compile("(\\d{2}):([0-5]\\d):([0-5]\\d)(?:,(\\d{3}))?");
 
     private final int startTime;
     private final int endTime;
@@ -64,7 +64,7 @@ public class SubRipCue implements Comparable<SubRipCue> {
         return (Integer.parseInt(matcher.group(1)) * 3600000) +
                 (Integer.parseInt(matcher.group(2)) * 60000) +
                 (Integer.parseInt(matcher.group(3)) * 1000) +
-                (Integer.parseInt(matcher.group(4)));
+                (Integer.parseInt(matcher.group(4) == null ? "0" : matcher.group(4)));
     }
 
 

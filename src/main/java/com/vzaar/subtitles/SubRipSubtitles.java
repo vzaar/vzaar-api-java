@@ -4,14 +4,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * SubRip format subtitles builder
+ */
 public class SubRipSubtitles {
     private List<SubRipCue> cues = new ArrayList<>();
 
+    /**
+     * Add a cue to the subtitles
+     * @param startTime the time to start displaying the cue, formatted as HH:MM:SS or HH:MM:SS,mmm
+     * @param endTime the time to stop displaying the cue, formatted as HH:MM:SS or HH:MM:SS,mmm
+     * @param text the subtitles
+     * @return this
+     */
     public SubRipSubtitles addCue(String startTime, String endTime, String text) {
         validateAndAdd(new SubRipCue(startTime, endTime, text));
         return this;
     }
 
+    /**
+     * Add a cue to the subtitles
+     * @param startTimeMillis the time to start displaying the cue in milliseconds from the start of the video
+     * @param endTimeMillis the time to stop displaying the cue in milliseconds from the start of the video
+     * @param text the subtitles
+     * @return this
+     */
     public SubRipSubtitles addCue(int startTimeMillis, int endTimeMillis, String text) {
         validateAndAdd(new SubRipCue(startTimeMillis, endTimeMillis, text));
         return this;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vzaar.client.ResourcePath;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @ResourcePath(path = "feeds/playlists")
@@ -21,7 +22,7 @@ public class Playlist implements Identifiable {
     private boolean autoplay;
     private boolean continuousPlay;
     private String embedCode;
-    private List<Video> videos;
+    private List<Video> videos = new ArrayList<>();
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 

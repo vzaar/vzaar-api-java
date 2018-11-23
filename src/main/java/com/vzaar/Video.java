@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vzaar.client.ResourcePath;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @ResourcePath(path = "videos")
@@ -27,11 +28,11 @@ public class Video implements Identifiable {
     private String assetUrl;
     private String posterUrl;
     private String embedCode;
-    private List<Category> categories;
-    private List<Advert> adverts;
-    private List<Rendition> renditions;
-    private List<LegacyRendition> legacyRenditions;
-    private List<Subtitle> subtitles;
+    private List<Category> categories = new ArrayList<>();
+    private List<Advert> adverts = new ArrayList<>();
+    private List<Rendition> renditions = new ArrayList<>();
+    private List<LegacyRendition> legacyRenditions = new ArrayList<>();
+    private List<Subtitle> subtitles = new ArrayList<>();
 
     public int getId() {
         return id;

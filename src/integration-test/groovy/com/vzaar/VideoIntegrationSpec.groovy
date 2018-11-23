@@ -123,7 +123,7 @@ class VideoIntegrationSpec extends BaseIntegrationSpec {
 
     def "I can search for a video by title"() {
         given:
-        Page<Video> allVideosPage = vzaar.videos().list().withSortByAttribute("title").results()
+        Page<Video> allVideosPage = vzaar.videos().list().withSortByAttribute("created_at").withSortDirection(SortDirection.desc).results()
 
         when:
         Page<Video> searchVideosPage = vzaar.videos().list().withSortByAttribute("title").withEscapedQuery(allVideosPage.data[0].title).results()

@@ -24,7 +24,7 @@ in your projects as follows:
 
 ### Gradle/Grails
 ```
-    compile 'com.vzaar:vzaar-java-sdk:2.1.0'
+    compile 'com.vzaar:vzaar-java-sdk:2.1.1'
 ```
 
 ### Apache Maven
@@ -32,13 +32,13 @@ in your projects as follows:
     <dependency>
         <groupId>com.vzaar</groupId>
         <artifactId>vzaar-java-sdk</artifactId>
-        <version>2.1.0</version>
+        <version>2.1.1</version>
     </dependency>
 ```
 
 ### Apache Ivy
 ```
-    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.1.0" />
+    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.1.1" />
 ```
 
 ## Paged Requests
@@ -95,6 +95,39 @@ stream.
     // An iterable wrapper around the iterator
     for (Video video : Pages.iterable(vzaar.videos().list().results()) {
     }
+```
+
+## Basic Video Functions
+
+Searching for videos
+```$java
+    Page<Video> videos = vzaar.videos().list()
+            .withEscapedQuery("[Vzaar]")
+            .withResultsPerPage(2)
+            .withSortByAttribute("title")
+            .withSortDirection(SortDirection.asc)
+            .results();
+
+```
+
+Fetching a video by id
+```$java
+    Video video = vzaar.videos().get(videoId);
+```
+
+Updating a video
+```$java
+    Video video = vzaar.videos().update(videoId)
+        .withTitle("[Vzaar] New Title")
+        .withDescription("Updated video description")
+        .withPrivate(true)
+        .withSeoUrl("http://www.vzaar.com/video.mp4")
+        .result();
+```
+
+Deleting a video
+```$java
+    vzaar.videos().delete(videoId);
 ```
 
 ## Video Uploading
