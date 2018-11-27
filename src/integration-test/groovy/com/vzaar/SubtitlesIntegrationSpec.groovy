@@ -33,7 +33,7 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
                 .withUrl("https://github.com/nine-lives/vzaar-sdk-java/raw/master/src/integration-test/resources/videos/small.mp4")
                 .withUploader("integration-test")
                 .withDescription("Link video description")
-                .withTitle("Link video")
+                .withTitle("Link video " + UUID.randomUUID().toString())
                 .result()
 
         when:
@@ -74,18 +74,27 @@ class SubtitlesIntegrationSpec extends BaseIntegrationSpec {
         then:
         subtitles.size() == 2
 
-        when:
+        when: "I fetch the video by its ID"
         Video videoWithSubtitles = vzaar.videos().get(video.getId())
 
-        then:
+        then: "I can see that the video subtitles are returned"
         videoWithSubtitles.subtitles.size() == 2
+
+        when: "I fetch the video as part of search"
+        waitForVideo(video)
+        Page<Video> videos = vzaar.videos().list().withEscapedQuery(video.title).results()
+
+        then: "I can see that the subtitles are not returned"
+        videos.data.size() == 1
+        videos.data[0].title == video.title
+        videos.data[0].subtitles.size() == 0
 
         cleanup:
         if (subtitleEn) {
             vzaar.subtitles().delete(video.id, subtitleEn.id)
         }
         if (subtitleFr) {
-            vzaar.subtitles().delete(video.id, subtitleEn.id)
+            vzaar.subtitles().delete(video.id, subtitleFr.id)
         }
         if (video) {
             vzaar.videos().delete(video.id)

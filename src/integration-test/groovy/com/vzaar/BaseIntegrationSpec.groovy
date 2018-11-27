@@ -75,4 +75,23 @@ public class BaseIntegrationSpec extends Specification {
             sleep(10000)
         }
     }
+
+    protected void waitForPending() {
+        while (vzaar.videos().list().withState(VideoState.processing).results().totalCount > 0) {
+            try {
+                sleep(10000)
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    protected void waitForVideo(Video video) {
+        while (vzaar.videos().list().withEscapedQuery(video.title).results().totalCount == 0) {
+            try {
+                sleep(10000)
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
 }
