@@ -28,6 +28,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -66,30 +68,32 @@ public class RestClient {
         return new Resource<>(this, type);
     }
 
-    public String s3(InputStream in, Signature signature, int part) throws IOException {
+    public void s3(InputStream in, Signature signature, int part) throws IOException {
         HttpPost request = new HttpPost(signature.getUploadHostname());
         String fileSuffix = signature.getType() == UploadType.multipart ? "." + part : "";
         ContentBody body = new FileStreamingBody(in, signature.getFilename(), signature.getType() == UploadType.multipart
                 ? signature.getPartSizeInBytes()
                 : signature.getFilesize());
+
         request.addHeader("User-agent", configuration.getUserAgent());
-        request.addHeader("x-amz-acl", signature.getAcl());
-        request.addHeader("Enclosure-Type", "multipart/form-data");
         request.setEntity(MultipartEntityBuilder.create()
-                .addTextBody("AWSAccessKeyId", signature.getAccessKeyId())
-                .addTextBody("Signature", signature.getSignature())
                 .addTextBody("acl", signature.getAcl())
                 .addTextBody("bucket", signature.getBucket())
                 .addTextBody("policy", signature.getPolicy())
                 .addTextBody("success_action_status", signature.getSuccessActionStatus())
-                .addTextBody("x-amz-meta-uploader", signature.getUploader())
                 .addTextBody("key", signature.getKey() + fileSuffix)
+                .addTextBody("x-amz-meta-uploader", signature.getUploader())
+                .addTextBody("x-amz-credential", signature.getCredential())
+                .addTextBody("x-amz-algorithm", signature.getAlgorithm())
+                .addTextBody("x-amz-date", signature.getDate())
+                .addTextBody("x-amz-signature", signature.getSignature())
                 .addPart("file", body)
                 .build());
-
         HttpResponse response = httpClient.execute(request);
+        if (response.getStatusLine().getStatusCode() >= 202) {
+            throw new VzaarException(EntityUtils.toString(response.getEntity()));
+        }
         EntityUtils.consume(response.getEntity());
-        return signature.getGuid();
     }
 
     String getEndpoint() {
@@ -120,7 +124,23 @@ public class RestClient {
         }
     }
 
+    <T> Resource<T> postUpload(Resource<T> resource, Map<String, Object> payload) {
+        try {
+            return execute(resource, setPayload(new HttpPost(resource.getUri()), payload));
+        } catch (IOException | URISyntaxException e) {
+            throw new VzaarException(e);
+        }
+    }
+
     <T> Resource<T> patch(Resource<T> resource, Object payload) {
+        try {
+            return execute(resource, setPayload(new HttpPatch(resource.getUri()), payload));
+        } catch (IOException | URISyntaxException e) {
+            throw new VzaarException(e);
+        }
+    }
+
+    <T> Resource<T> patchUpload(Resource<T> resource, Map<String, Object> payload) {
         try {
             return execute(resource, setPayload(new HttpPatch(resource.getUri()), payload));
         } catch (IOException | URISyntaxException e) {
@@ -174,6 +194,21 @@ public class RestClient {
         StringEntity entity = new StringEntity(objectMapper.writeValueAsString(payload));
         entity.setContentType("application/json");
         request.setEntity(entity);
+        return request;
+    }
+
+    private <T extends HttpEntityEnclosingRequest> T setPayload(T request, Map<String, Object> payload) throws IOException {
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        for (Map.Entry<String, Object> entry : payload.entrySet()) {
+            if (entry.getValue() instanceof File) {
+                File file = (File) entry.getValue();
+                ContentBody body = new FileStreamingBody(new FileInputStream(file), file.getName(), file.length());
+                builder.addPart(entry.getKey(), body);
+            } else {
+                builder.addTextBody(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+        }
+        request.setEntity(builder.build());
         return request;
     }
 

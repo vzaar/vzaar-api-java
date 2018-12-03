@@ -2,15 +2,21 @@ package com.vzaar;
 
 public class Rendition implements Identifiable  {
     private int id;
+    private String code;
     private Integer width;
     private Integer height;
     private Integer bitrate;
     private String framerate;
     private String status;
     private Long sizeInBytes;
+    private String url;
 
     public int getId() {
         return id;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     public Integer getWidth() {
@@ -35,5 +41,9 @@ public class Rendition implements Identifiable  {
 
     public Long getSizeInBytes() {
         return sizeInBytes;
+    }
+
+    public String getUrl() {
+        return url;
     }
 }

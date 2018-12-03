@@ -130,6 +130,6 @@ public class SignatureRequest {
         if (type == UploadType.single) {
             desiredPartSize = null;
         }
-        return client.resource(Signature.class).action(type.name()).create(this).withSignatureRequest(this);
+        return client.resource(Signature.class).action(type.name() + "/2").create(this).withSignatureRequest(this);
     }
 }

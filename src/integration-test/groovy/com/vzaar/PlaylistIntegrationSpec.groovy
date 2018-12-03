@@ -196,7 +196,7 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
                 .withPrivate(false)
                 .withAutoplay(false)
                 .withContinuousPlay(false)
-                .withDimensions('1280x960')
+                .withDimensions('780x340')
                 .result()
 
         then:
@@ -207,7 +207,7 @@ class PlaylistIntegrationSpec extends BaseIntegrationSpec {
         entity.maxVids == 21
         entity.position == ControlsPosition.bottom
         !entity.private
-        entity.dimensions == '1280x960'
+        entity.dimensions == '780x340'
         !entity.autoplay
         !entity.continuousPlay
 

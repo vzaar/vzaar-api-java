@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.vzaar.util.ObjectMapperFactory
 import spock.lang.Specification
 
+import java.time.ZonedDateTime
+
 class SignatureSpec extends Specification {
     private ObjectMapper mapper;
 
@@ -18,13 +20,14 @@ class SignatureSpec extends Specification {
         String payload = '''
             {
               "data": {
-                "access_key_id": "<access-key-id>",
-                "key": "vzaar/vz9/1e8/source/vz91e80db09a494467b265f0c327950825/${filename}",
+                "x-amz-credential": "AKIAJ74MFWNVAFH6P7FQ/20181101/us-east-1/s3/aws4_request",
+                "x-amz-algorithm": "AWS4-HMAC-SHA256",
+                "x-amz-date": "20181101T151558Z",
+                "x-amz-signature": "<signature-string>",
+                "key": "vzaar/th2/Z_1/source/th2Z_17QvJwE/${filename}",
                 "acl": "private",
                 "policy": "<signed-policy-string>",
-                "signature": "vzaar/vz9/1e8/source/vz91e80db09a494467b265f0c327950825/${filename}",
                 "success_action_status": "201",
-                "content_type": "binary/octet-stream",
                 "guid": "vz91e80db09a494467b265f0c327950825",
                 "bucket": "vzaar-upload-development",
                 "upload_hostname": "https://vzaar-upload-development.s3.amazonaws.com",
@@ -40,13 +43,14 @@ class SignatureSpec extends Specification {
 
         then:
         with(entity.data) {
-            accessKeyId == '<access-key-id>'
-            key == 'vzaar/vz9/1e8/source/vz91e80db09a494467b265f0c327950825/${filename}'
+            credential == 'AKIAJ74MFWNVAFH6P7FQ/20181101/us-east-1/s3/aws4_request'
+            algorithm == 'AWS4-HMAC-SHA256'
+            date == '20181101T151558Z'
+            signature == '<signature-string>'
+            key == 'vzaar/th2/Z_1/source/th2Z_17QvJwE/${filename}'
             acl == 'private'
             policy == '<signed-policy-string>'
-            signature == 'vzaar/vz9/1e8/source/vz91e80db09a494467b265f0c327950825/${filename}'
             successActionStatus == '201'
-            contentType == 'binary/octet-stream'
             guid == 'vz91e80db09a494467b265f0c327950825'
             bucket == 'vzaar-upload-development'
             uploadHostname == 'https://vzaar-upload-development.s3.amazonaws.com'
@@ -54,5 +58,24 @@ class SignatureSpec extends Specification {
             partSizeInBytes == 16777216l
             parts == 4
         }
+    }
+
+    def "I can delegate the SignatureRequest fields"() {
+        given:
+        Signature signature = new Signature();
+        SignatureRequest request = new SignatureRequest()
+            .withFilename("filename.mp4")
+            .withFilesize(12345)
+            .withUploader("uploader")
+            .withUploadType(UploadType.single)
+
+        when:
+        signature.withSignatureRequest(request)
+
+        then:
+        signature.filename == 'filename.mp4'
+        signature.filesize == 12345
+        signature.uploader == 'uploader'
+        signature.type == UploadType.single
     }
 }

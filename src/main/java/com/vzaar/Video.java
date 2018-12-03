@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vzaar.client.ResourcePath;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @ResourcePath(path = "videos")
@@ -11,21 +12,27 @@ public class Video implements Identifiable {
     private int id;
     private String title;
     private Integer userId;
+    private String userLogin;
     private Integer accountId;
+    private String accountName;
     private String description;
     private Double duration;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
     @JsonProperty(value = "private")
     private boolean isPrivate;
-    private String seoUrl;
-    private String url;
     private VideoState state;
+    private String url;
+    private String seoUrl;
     private String thumbnailUrl;
+    private String assetUrl;
+    private String posterUrl;
     private String embedCode;
-    private List<Category> categories;
-    private List<Rendition> renditions;
-    private List<LegacyRendition> legacyRenditions;
+    private List<Category> categories = new ArrayList<>();
+    private List<Advert> adverts = new ArrayList<>();
+    private List<Rendition> renditions = new ArrayList<>();
+    private List<LegacyRendition> legacyRenditions = new ArrayList<>();
+    private List<Subtitle> subtitles = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -39,8 +46,16 @@ public class Video implements Identifiable {
         return userId;
     }
 
+    public String getUserLogin() {
+        return userLogin;
+    }
+
     public Integer getAccountId() {
         return accountId;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public String getDescription() {
@@ -63,16 +78,24 @@ public class Video implements Identifiable {
         return isPrivate;
     }
 
-    public String getSeoUrl() {
-        return seoUrl;
+    public VideoState getState() {
+        return state;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public VideoState getState() {
-        return state;
+    public String getSeoUrl() {
+        return seoUrl;
+    }
+
+    public String getAssetUrl() {
+        return assetUrl;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
     }
 
     public String getThumbnailUrl() {
@@ -93,5 +116,13 @@ public class Video implements Identifiable {
 
     public List<Category> getCategories() {
         return categories;
+    }
+
+    public List<Advert> getAdverts() {
+        return adverts;
+    }
+
+    public List<Subtitle> getSubtitles() {
+        return subtitles;
     }
 }
