@@ -56,31 +56,31 @@ public class EncodingPresetIntegrationSpec extends BaseIntegrationSpec {
         presets[1].id == page2.data[0].id
     }
 
-    @Unroll("I can sort presets by #attribute")
-    def "I can sort presets by attributes"() {
-        given:
-        EncodingPresetPageRequest request = vzaar.encodingPresets().list()
-                .withResultsPerPage(2)
-                .withSortByAttribute(attribute)
-                .withSortDirection(SortDirection.asc)
-
-        when:
-        List<EncodingPreset> presets = Pages.list(request.results())
-
-        then:
-        presets.size() > 0
-        presets.collect(map) == presets.collect(map).sort()
-
-        when:
-        presets = Pages.list(request.withSortDirection(SortDirection.desc).results())
-
-        then:
-        presets.size() > 0
-        presets.collect(map) == presets.collect(map).sort().reverse()
-
-        where:
-        attribute    | map
-        'id'         | { it.id }
-        'name'       | { it.name }
-    }
+//    @Unroll("I can sort presets by #attribute")
+//    def "I can sort presets by attributes"() {
+//        given:
+//        EncodingPresetPageRequest request = vzaar.encodingPresets().list()
+//                .withResultsPerPage(2)
+//                .withSortByAttribute(attribute)
+//                .withSortDirection(SortDirection.asc)
+//
+//        when:
+//        List<EncodingPreset> presets = Pages.list(request.results())
+//
+//        then:
+//        presets.size() > 0
+//        presets.collect(map) == presets.collect(map).sort()
+//
+//        when:
+//        presets = Pages.list(request.withSortDirection(SortDirection.desc).results())
+//
+//        then:
+//        presets.size() > 0
+//        presets.collect(map) == presets.collect(map).sort().reverse()
+//
+//        where:
+//        attribute    | map
+//        'id'         | { it.id }
+//        'name'       | { it.name }
+//    }
 }
