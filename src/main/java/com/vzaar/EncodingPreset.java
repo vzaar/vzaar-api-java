@@ -21,6 +21,7 @@ public class EncodingPreset implements Identifiable  {
     private int audioSampleRate;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
+    private String code;
 
     public int getId() {
         return id;
@@ -80,5 +81,9 @@ public class EncodingPreset implements Identifiable  {
 
     public ZonedDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getCode() {
+        return code;
     }
 }

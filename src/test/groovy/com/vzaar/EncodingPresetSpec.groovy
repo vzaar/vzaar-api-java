@@ -28,6 +28,7 @@ class EncodingPresetSpec extends Specification {
                   "audio_bitrate_kbps": 128,
                   "audio_channels": 2,
                   "audio_sample_rate": 44100,
+                  "code": "code-code",
                   "created_at": "2016-10-24T12:36:47.000Z",
                   "updated_at": "2016-10-24T12:36:47.000Z"
               }
@@ -54,6 +55,7 @@ class EncodingPresetSpec extends Specification {
             audioSampleRate == 44100
             createdAt.isEqual(ZonedDateTime.parse("2016-10-24T12:36:47.000Z"))
             updatedAt.isEqual(ZonedDateTime.parse("2016-10-24T12:36:47.000Z"))
+            code == 'code-code'
         }
     }
 }
