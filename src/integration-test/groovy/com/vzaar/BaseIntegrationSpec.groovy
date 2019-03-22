@@ -1,5 +1,6 @@
 package com.vzaar
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.vzaar.client.RestClientConfiguration
 import com.vzaar.util.ObjectMapperFactory
 import spock.lang.Specification;
@@ -86,12 +87,15 @@ public class BaseIntegrationSpec extends Specification {
     }
 
     protected void waitForVideo(Video video) {
-        while (vzaar.videos().list().withEscapedQuery(video.title).results().totalCount == 0) {
+        Video waitForVideo
+        while (waitForVideo == null || waitForVideo.state == VideoState.processing) {
             try {
                 sleep(10000)
+                waitForVideo = vzaar.videos().get(video.id)
+            } catch(UnrecognizedPropertyException e) {
+                throw e
             } catch (Exception ignore) {
             }
         }
     }
-
 }

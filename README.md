@@ -23,7 +23,7 @@ in your projects as follows:
 
 ### Gradle/Grails
 ```
-    compile 'com.vzaar:vzaar-java-sdk:2.1.1'
+    compile 'com.vzaar:vzaar-java-sdk:2.1.2'
 ```
 
 ### Apache Maven
@@ -31,13 +31,13 @@ in your projects as follows:
     <dependency>
         <groupId>com.vzaar</groupId>
         <artifactId>vzaar-java-sdk</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.2</version>
     </dependency>
 ```
 
 ### Apache Ivy
 ```
-    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.1.1" />
+    <dependency org="com.vzaar" name="vzaar-java-sdk" rev="2.1.2" />
 ```
 
 ## Paged Requests
