@@ -20,6 +20,7 @@ import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
@@ -191,7 +192,7 @@ public class RestClient {
     }
 
     private <T extends HttpEntityEnclosingRequest> T setPayload(T request, Object payload) throws JsonProcessingException, UnsupportedEncodingException {
-        StringEntity entity = new StringEntity(objectMapper.writeValueAsString(payload));
+        StringEntity entity = new StringEntity(objectMapper.writeValueAsString(payload), "UTF-8");
         entity.setContentType("application/json");
         request.setEntity(entity);
         return request;
