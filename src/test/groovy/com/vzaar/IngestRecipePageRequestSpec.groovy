@@ -52,7 +52,7 @@ class IngestRecipePageRequestSpec extends Specification {
 
     def "I can convert a query string back to a request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/encoding_presets?page=2&per_page=5&sort=name&order=desc"
+        String query = "https://app.raazv.com/api/v2/encoding_presets?page=2&per_page=5&sort=name&order=desc"
 
         when:
         IngestRecipePageRequest request = mapper.read(new URL(query), IngestRecipePageRequest);
@@ -68,7 +68,7 @@ class IngestRecipePageRequestSpec extends Specification {
 
     def "I can modify a mapped request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/ingest_recipes?page=2&per_page=5&sort=name&order=desc"
+        String query = "https://app.raazv.com/api/v2/ingest_recipes?page=2&per_page=5&sort=name&order=desc"
 
         when:
         IngestRecipePageRequest request = mapper.read(new URL(query), IngestRecipePageRequest);

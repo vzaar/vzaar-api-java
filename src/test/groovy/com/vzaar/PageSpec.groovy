@@ -23,9 +23,9 @@ class PageSpec extends Specification {
               ],
               "meta": {
                 "links": {
-                  "first": "http://api.vzaar.com/api/v2/videos",
-                  "last": "http://api.vzaar.com/api/v2/videos?page=4",
-                  "next": "http://api.vzaar.com/api/v2/videos?page=2",
+                  "first": "https://app.raazv.com/api/v2/videos",
+                  "last": "https://app.raazv.com/api/v2/videos?page=4",
+                  "next": "https://app.raazv.com/api/v2/videos?page=2",
                   "previous": null
                 },
                 "total_count": 4
@@ -47,11 +47,11 @@ class PageSpec extends Specification {
         !entity.hasPrevious()
         with(entity.meta) {
             totalCount == 4
-            firstLink == 'http://api.vzaar.com/api/v2/videos'
+            firstLink == 'https://app.raazv.com/api/v2/videos'
             hasFirstLink()
-            nextLink == 'http://api.vzaar.com/api/v2/videos?page=2'
+            nextLink == 'https://app.raazv.com/api/v2/videos?page=2'
             hasNextLink()
-            lastLink == 'http://api.vzaar.com/api/v2/videos?page=4'
+            lastLink == 'https://app.raazv.com/api/v2/videos?page=4'
             hasLastLink()
             !hasPreviousLink()
         }

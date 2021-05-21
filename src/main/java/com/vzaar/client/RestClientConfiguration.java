@@ -6,7 +6,7 @@ import java.util.Properties;
 public class RestClientConfiguration {
     private final String sdkUserAgent;
     private String userAgent;
-    private String endpoint = "https://api.vzaar.com/api/v2";
+    private String endpoint = "https://app.raazv.com/api/v2";
     private String clientId;
     private String authToken;
     private int maxConnectionsPerRoute = 20;
@@ -24,7 +24,7 @@ public class RestClientConfiguration {
     }
 
     /**
-     * Set the base api url. Defaults to https://api.vzaar.com/api/v2
+     * Set the base api url. Defaults to https://app.raazv.com/api/v2
      *
      * @param endpoint the base api url
      * @return this instance

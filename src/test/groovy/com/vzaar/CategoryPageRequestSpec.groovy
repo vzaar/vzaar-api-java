@@ -50,7 +50,7 @@ class CategoryPageRequestSpec extends Specification {
 
     def "I can convert a query string back to a request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/categories?levels=2&ids%5B%5D=3445&ids%5B%5D=3446&page=2&per_page=1"
+        String query = "https://app.raazv.com/api/v2/categories?levels=2&ids%5B%5D=3445&ids%5B%5D=3446&page=2&per_page=1"
 
         when:
         CategoryPageRequest request = mapper.read(new URL(query), CategoryPageRequest);
@@ -66,7 +66,7 @@ class CategoryPageRequestSpec extends Specification {
 
     def "I can modify a mapped request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/categories?levels=2&ids%5B%5D=3445&ids%5B%5D=3446&per_page=5"
+        String query = "https://app.raazv.com/api/v2/categories?levels=2&ids%5B%5D=3445&ids%5B%5D=3446&per_page=5"
 
         when:
         CategoryPageRequest request = mapper.read(new URL(query), CategoryPageRequest);

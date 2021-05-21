@@ -14,7 +14,7 @@ class VzaarSpec extends Specification {
         config.authToken == "authToken"
         config.clientId == "clientId"
         config.defaultDesiredChunkSizeInMb == 128
-        config.endpoint == 'https://api.vzaar.com/api/v2'
+        config.endpoint == 'https://app.raazv.com/api/v2'
         config.maxConnectionsPerRoute == 20
         config.useMultipartWhenFileSizeInMbOver == 1024
         config.useMultipartWhenFileSizeOver == 1073741824l

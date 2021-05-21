@@ -50,7 +50,7 @@ class RequestParameterMapperSpec extends Specification {
 
     def "I can convert a query string back to a request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/videos?q=query&state=failed&per_page=5&nonexisting=false"
+        String query = "https://app.raazv.com/api/v2/videos?q=query&state=failed&per_page=5&nonexisting=false"
 
         when:
         VideoPageRequest request = mapper.read(new URL(query), VideoPageRequest);
@@ -65,7 +65,7 @@ class RequestParameterMapperSpec extends Specification {
 
     def "I can modify a mapped request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/videos?q=query&state=failed&per_page=5&nonexisting=false"
+        String query = "https://app.raazv.com/api/v2/videos?q=query&state=failed&per_page=5&nonexisting=false"
 
         when:
         VideoPageRequest request = mapper.read(new URL(query), VideoPageRequest);

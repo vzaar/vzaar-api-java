@@ -13,10 +13,10 @@ class PageMetadataSpec extends Specification {
         String json = '''
             {
                 "links": {
-                  "first": "http://api.vzaar.com/api/v2/videos",
-                  "last": "http://api.vzaar.com/api/v2/videos?page=5",
-                  "next": "http://api.vzaar.com/api/v2/videos?page=4",
-                  "previous": "http://api.vzaar.com/api/v2/videos?page=2"
+                  "first": "https://app.raazv.com/api/v2/videos",
+                  "last": "https://app.raazv.com/api/v2/videos?page=5",
+                  "next": "https://app.raazv.com/api/v2/videos?page=4",
+                  "previous": "https://app.raazv.com/api/v2/videos?page=2"
                 },
                 "total_count": 5
             }
@@ -27,13 +27,13 @@ class PageMetadataSpec extends Specification {
 
         then:
         entity.totalCount == 5
-        entity.firstLink == 'http://api.vzaar.com/api/v2/videos'
+        entity.firstLink == 'https://app.raazv.com/api/v2/videos'
         entity.hasFirstLink()
-        entity.nextLink == 'http://api.vzaar.com/api/v2/videos?page=4'
+        entity.nextLink == 'https://app.raazv.com/api/v2/videos?page=4'
         entity.hasNextLink()
-        entity.lastLink == 'http://api.vzaar.com/api/v2/videos?page=5'
+        entity.lastLink == 'https://app.raazv.com/api/v2/videos?page=5'
         entity.hasLastLink()
-        entity.previousLink == 'http://api.vzaar.com/api/v2/videos?page=2'
+        entity.previousLink == 'https://app.raazv.com/api/v2/videos?page=2'
         entity.hasPreviousLink()
     }
 
@@ -42,9 +42,9 @@ class PageMetadataSpec extends Specification {
         String json = '''
             {
                 "links": {
-                  "first": "http://api.vzaar.com/api/v2/videos",
-                  "last": "http://api.vzaar.com/api/v2/videos?page=4",
-                  "next": "http://api.vzaar.com/api/v2/videos?page=2",
+                  "first": "https://app.raazv.com/api/v2/videos",
+                  "last": "https://app.raazv.com/api/v2/videos?page=4",
+                  "next": "https://app.raazv.com/api/v2/videos?page=2",
                   "previous": null
                 },
                 "total_count": 4
@@ -67,10 +67,10 @@ class PageMetadataSpec extends Specification {
         String json = '''
             {
                 "links": {
-                  "first": "http://api.vzaar.com/api/v2/videos",
-                  "last": "http://api.vzaar.com/api/v2/videos?page=4",
+                  "first": "https://app.raazv.com/api/v2/videos",
+                  "last": "https://app.raazv.com/api/v2/videos?page=4",
                   "next": null,
-                  "previous": "http://api.vzaar.com/api/v2/videos?page=2"
+                  "previous": "https://app.raazv.com/api/v2/videos?page=2"
                 },
                 "total_count": 4
             }
@@ -92,10 +92,10 @@ class PageMetadataSpec extends Specification {
         String json = '''
             {
                 "links": {
-                  "first": "http://api.vzaar.com/api/v2/videos",
+                  "first": "https://app.raazv.com/api/v2/videos",
                   "last": null,
                   "next": null,
-                  "previous": "http://api.vzaar.com/api/v2/videos?page=2"
+                  "previous": "https://app.raazv.com/api/v2/videos?page=2"
                 },
                 "total_count": 4
             }

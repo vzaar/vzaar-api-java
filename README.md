@@ -1,9 +1,9 @@
 # Vzaar Java SDK
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.vzaar/vzaar-java-sdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.vzaar/vzaar-java-sdk)
-[![Build Status](https://api.travis-ci.com/vzaar/vzaar-api-java.svg)](https://travis-ci.com/github/vzaar/vzaar-api-java)
-[![Code Quality](https://api.codacy.com/project/badge/grade/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
-[![Coverage](https://api.codacy.com/project/badge/coverage/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
+[![Build Status](https://app.travis-ci.com/vzaar/vzaar-api-java.svg)](https://travis-ci.com/github/vzaar/vzaar-api-java)
+[![Code Quality](https://app.codacy.com/project/badge/grade/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
+[![Coverage](https://app.codacy.com/project/badge/coverage/e37e10ecd34e4942acc11ebbb8aa2e3c)](https://www.codacy.com/app/nine-lives/vzaar-sdk-java)
 
 Vzaar Java SDK for Java 8+
 
@@ -282,7 +282,7 @@ from the the client id and auth token all the other values have defaults.
     Vzaar vzaar = Vzaar.make(new RestClientConfiguration()
         .withClientId(clientId)
         .withAuthToken(authToken)
-        .withEndpoint("https://api.vzaar.com/api/v2")
+        .withEndpoint("https://app.raazv.com/api/v2")
         .withMaxConnectionsPerRoute(20)
         .withUserAgent("vzaar-sdk-java 2.0.0")
         .withBlockTillRateLimitReset(false)
@@ -292,7 +292,7 @@ from the the client id and auth token all the other values have defaults.
 
 | Configuration Attribute | Description |
 | ----------------------- | ----------- |
-| Endpoint | The base api url. Defaults to https://api.vzaar.com/api/v2 |
+| Endpoint | The base api url. Defaults to https://app.raazv.com/api/v2 |
 | MaxConnectionsPerRoute | The effective maximum number of concurrent connections in the pool. Connections try to make use of the keep-alive directive. Defaults to 20
 | UserAgent | The user agent string sent in the request
 | BlockTillRateLimitReset | If set to true then the client will block if the rate limit has been reached until the reset timestamp has expired. Defaults to false

@@ -53,7 +53,7 @@ class EncodingPresetPageRequestSpec extends Specification {
 
     def "I can convert a query string back to a request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/encoding_presets?page=2&per_page=5&sort=name&order=desc"
+        String query = "https://app.raazv.com/api/v2/encoding_presets?page=2&per_page=5&sort=name&order=desc"
 
         when:
         EncodingPresetPageRequest request = mapper.read(new URL(query), EncodingPresetPageRequest);
@@ -69,7 +69,7 @@ class EncodingPresetPageRequestSpec extends Specification {
 
     def "I can modify a mapped request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/encoding_presets?page=2&per_page=5&sort=name&order=desc"
+        String query = "https://app.raazv.com/api/v2/encoding_presets?page=2&per_page=5&sort=name&order=desc"
 
         when:
         EncodingPresetPageRequest request = mapper.read(new URL(query), EncodingPresetPageRequest);

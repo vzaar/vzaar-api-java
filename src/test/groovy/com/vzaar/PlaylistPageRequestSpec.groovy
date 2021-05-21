@@ -53,7 +53,7 @@ class PlaylistPageRequestSpec extends Specification {
 
     def "I can convert a query string back to a request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/feeds/playlists?page=2&per_page=5&sort=name&order=desc"
+        String query = "https://app.raazv.com/api/v2/feeds/playlists?page=2&per_page=5&sort=name&order=desc"
 
         when:
         PlaylistPageRequest request = mapper.read(new URL(query), PlaylistPageRequest);
@@ -69,7 +69,7 @@ class PlaylistPageRequestSpec extends Specification {
 
     def "I can modify a mapped request object"() {
         given:
-        String query = "https://api.vzaar.com/api/v2/feeds/playlists?page=2&per_page=5&sort=name&order=desc"
+        String query = "https://app.raazv.com/api/v2/feeds/playlists?page=2&per_page=5&sort=name&order=desc"
 
         when:
         PlaylistPageRequest request = mapper.read(new URL(query), PlaylistPageRequest);

@@ -20,7 +20,7 @@ class RestClientConfigurationSpec extends Specification {
         config.authToken == null
         config.clientId == null
         config.defaultDesiredChunkSizeInMb == 128
-        config.endpoint == 'https://api.vzaar.com/api/v2'
+        config.endpoint == 'https://app.raazv.com/api/v2'
         config.maxConnectionsPerRoute == 20
         config.useMultipartWhenFileSizeInMbOver == 1024
         config.useMultipartWhenFileSizeOver == 1073741824l
