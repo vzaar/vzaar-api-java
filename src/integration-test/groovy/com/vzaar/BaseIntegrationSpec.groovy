@@ -13,7 +13,6 @@ public class BaseIntegrationSpec extends Specification {
     private static boolean firstRun = true
 
     def setupSpec() {
-        ObjectMapperFactory.setFailOnUnknownProperties(true)
         vzaar = Vzaar.make(new RestClientConfiguration()
                 .withEndpoint(System.getProperty("vzaarEndpoint") ?: System.getenv("vzaarEndpoint") ?: "https://api.vzaar.com/api/v2")
                 .withClientId(System.getProperty("vzaarClientId") ?: System.getenv("vzaarClientId"))
