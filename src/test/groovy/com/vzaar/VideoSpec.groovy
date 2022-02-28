@@ -12,7 +12,6 @@ class VideoSpec extends Specification {
     private ObjectMapper mapper
 
     def setup() {
-        ObjectMapperFactory.setFailOnUnknownProperties(true)
         mapper = ObjectMapperFactory.make()
     }
 
@@ -81,7 +80,7 @@ class VideoSpec extends Specification {
                 ],
                 "renditions": [
                   {
-                    "id": 66,
+                    "id": "surprise string!",
                     "code": "magic",
                     "width": 416,
                     "height": 258,
@@ -136,7 +135,6 @@ class VideoSpec extends Specification {
             categories.size() == 1
         }
         with(entity.data.renditions[0]) {
-            id == 66
             code == 'magic'
             width == 416
             height == 258

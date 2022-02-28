@@ -1,7 +1,6 @@
 package com.vzaar;
 
 public class Rendition implements Identifiable  {
-    private int id;
     private String code;
     private Integer width;
     private Integer height;
@@ -12,7 +11,7 @@ public class Rendition implements Identifiable  {
     private String url;
 
     public int getId() {
-        return id;
+        return 0;
     }
 
     public String getCode() {

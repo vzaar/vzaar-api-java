@@ -9,7 +9,6 @@ class SignatureRequestSpec extends Specification {
     private ObjectMapper mapper;
 
     def setup() {
-        ObjectMapperFactory.setFailOnUnknownProperties(true)
         mapper = ObjectMapperFactory.make()
     }
 
